@@ -1,0 +1,90 @@
+.Tile {
+  width: 3.4rem;
+  height: 3.4rem;
+  background-color: whitesmoke;
+  margin: auto;
+
+}
+.TileCenter {
+  width: 2.8rem;
+  height: 2.8rem;
+  position: absolute;
+  margin-left: 0.3rem;
+  margin-top: 0.3rem;
+  display: flex;
+}
+
+.TileBorder {
+  width: fit-content;
+  height: fit-content;
+  
+  background-color: wheat;
+  display: flex;
+  margin: 1px;
+}
+
+.NorthWall {
+  width: 3.4rem;
+  height: 0.3rem;
+  background-color: darkgreen;
+  position: absolute;
+
+}
+
+.SouthWall {
+  width: 3.4rem;
+  height: 0.3rem;
+  background-color: darkgreen;
+  position: absolute;
+  margin-top: 3.1rem;
+  display: flex;
+}
+
+.WestWall {
+  height: 3.4rem;
+  width: 0.3rem;
+  background-color: darkgreen;
+  position: absolute;
+  display: flex;
+}
+
+.EastWall {
+  height: 3.4rem;
+  width: 0.3rem;
+  background-color: darkgreen;
+  position: absolute;
+  margin-left: 3.1rem;
+
+  display: flex;
+}
+
+
+
+.HorisontalWall {
+  width: 100%;
+  height: 10%;
+  background-color: darkgreen;
+  display: flex;
+  margin: auto;
+}
+
+.VerticalWall {
+  width: 10%;
+  height: 100%;
+  background-color: darkgreen;
+  display: flex;
+  margin: auto;
+}
+
+
+.Grid {
+  width: fit-content;
+  height: fit-content;
+  background-color: darkgreen;
+  margin: auto;
+}
+
+
+.Row {
+  display: flex;
+}

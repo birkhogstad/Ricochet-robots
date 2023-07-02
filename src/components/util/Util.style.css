@@ -1,0 +1,13 @@
+
+.ButtonReference {
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  margin: auto;
+}
+
+.ButtonString {
+  font-size: 1rem;
+  margin: 0.3rem;
+  font-weight: bolder;
+}

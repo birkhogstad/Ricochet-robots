@@ -3,8 +3,29 @@ import Grid from "./components/Grid";
 import { getInitialTiles, getWalls } from "./functions";
 import StateDisplay from "./components/StateDisplay";
 import Hub from "./components/Hub";
+import Board from "./components/board/Board";
+
+
+
 
 function App() {
+
+
+
+  return (
+    <div>
+      <Board />
+    </div>
+  );
+}
+
+export default App;
+/* 
+
+function App() {
+
+
+
   console.log(getWalls());
   return (
     <div
@@ -23,3 +44,4 @@ function App() {
 }
 
 export default App;
+ */

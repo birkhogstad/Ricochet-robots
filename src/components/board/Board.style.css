@@ -1,0 +1,71 @@
+.Board {
+  width: fit-content;
+  height: fit-content;
+  background-color: darkgreen;
+  margin: auto;
+}
+
+.Row {
+  display: flex;
+}
+
+
+
+
+
+.Tile {
+  width: 3.6rem;
+  height: 3.6rem;
+  background-color: whitesmoke;
+  margin: auto;
+
+}
+
+.TileCenter {
+  width: 3rem;
+  height: 3rem;
+  position: absolute;
+  margin-left: 0.3rem;
+  margin-top: 0.3rem;
+  display: flex;
+}
+
+
+
+
+
+
+
+
+.WallNorth {
+  width: 3.6rem;
+  height: 0.2rem;
+  background-color: darkgreen;
+  position: absolute;
+
+}
+.WallSouth {
+  width: 3.6rem;
+  height: 0.2rem;
+  background-color: darkgreen;
+  position: absolute;
+  margin-top: 3.4rem;
+  display: flex;
+}
+
+.WallWest {
+  height: 3.6rem;
+  width: 0.2rem;
+  background-color: darkgreen;
+  position: absolute;
+  display: flex;
+}
+
+.WallEast {
+  height: 3.6rem;
+  width: 0.2rem;
+  background-color: darkgreen;
+  position: absolute;
+  margin-left: 3.4rem;
+  display: flex;
+}

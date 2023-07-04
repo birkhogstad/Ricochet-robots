@@ -7,11 +7,11 @@ let tiles = []
 let pieces = []
 let goals = []
 
+let tileProps = []
 
 
-export function initiateTiles() {
-  tiles = []
 
+function initiateBoard() {
   let nextOffset = getNextOffset()
   let id = 0
   for(let i = 0; i < rowLength; i++) {
@@ -65,11 +65,18 @@ export function initiateTiles() {
       tile.wall[i] = null
     }
   })
-  console.log(tiles);
 
   initiateGoals()
-  return tiles
 
+
+
+  getTileProps()
+
+
+
+  console.log(getTileCorners());
+
+  return tiles
 }
 
 
@@ -94,7 +101,6 @@ function setWall(id, index) {
 }
 
 function wallBetween(a, b) {
-  console.log(a, b);
   if (a === null || b === null) {
     return
   }
@@ -109,9 +115,6 @@ function wallBetween(a, b) {
 
 
 function initiateGoals() {
-
-
-
 
   goals = []
   let g = [
@@ -241,13 +244,108 @@ function initiateGoals() {
   })
 
 
-  console.log(goals);
-
   walls.map((w) => {
     wallBetween(w[0], w[1])
   })
 
 }
+
+
+
+
+export function getTileProps() {
+
+  function setTileProps() {
+    if (tiles.length === 0) {
+      initiateBoard()
+    }
+
+    tiles.map((t) => {
+      let p = {
+        id : t.id,
+        center : 'inherit',
+        sides : [],
+      }
+      t.next.map((n) => {
+        p.sides.push(n === null ? 'black' : 'inherit')
+      })
+      tileProps.push(p)
+    })
+
+
+  }
+  if (tileProps.length === 0) {
+    setTileProps()
+  }
+  console.log(tileProps);
+  return tileProps
+}
+
+
+export function getTileCorners() {
+
+  if (tiles.length === 0) {
+    initiateBoard()
+  }
+
+  let foo = []
+  
+
+  tiles.map((t) => {
+
+    let c = ['inherit', 'inherit', 'inherit', 'inherit']
+    for (let i = 0; i < 4; i++) {
+
+      if (t.next[i] === null) {
+        c[i] = 'black'
+        c[(i + 1) % 4] = 'black'
+      }
+
+  /*     
+      let bar = 'inherit'
+      let index = [i, 3 - i]
+      let ids = [t.next[index[0]], t.next[index[1]]]
+      if (ids[0] === null || ids[1] === null) {
+        bar = 'black'
+      } else if (tiles[ids[0]].next[index[1]] === null && tiles[ids[1]].next[index[0]] === null){
+        bar = 'black'
+      }
+      c.push(bar)
+ */
+    }
+    loop:
+    for (let i = 0; i < 4; i++) {
+      if (c[i] === 'inherit') {
+
+        let indexes = [(4 - (1 - i)) % 4, i]
+
+        for (let j = 0; j < 2; j++) {
+          let x = indexes[j]
+          let y = indexes[1 - j]
+
+          let nextId = t.next[x]
+          let nextTile = tiles[nextId]
+          if (nextTile.next[y] !== null) {
+            continue loop
+          }
+        }
+        c[i] = 'black'
+
+      }
+
+
+    }
+
+
+    foo.push(c)
+  })
+  return foo
+
+}
+
+
+
+
 
 
 export function setPiecesLocation() {

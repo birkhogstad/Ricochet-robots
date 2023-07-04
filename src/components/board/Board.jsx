@@ -1,11 +1,144 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { initiateTiles } from './functions.Board';
 import { centerTileIds, colors, rowLength } from '../../functions.utils';
 
 
 import './Board.style.css';
+import { getTileCorners, getTileProps } from './functions.Board';
 
 
+export default function Board({
+
+}) {
+
+  const [nestedIds, setNestedIds] = useState(null)
+
+  const [tileCorners, setTileCorners] = useState(null)
+  const [tileData, setTileData] = useState(null)
+  
+  useEffect(() => {
+    getInitialBoard()
+  },[])
+
+
+  function getInitialBoard() {
+    let ids = []
+    let id = 0
+    for (let i = 0; i < 16; i++) {
+      let row = []
+      for (let j = 0; j < 16; j++) {
+        row.push(id)
+        id++
+      }
+      ids.push(row)
+    }
+    setNestedIds(ids)
+
+    setTileCorners(getTileCorners())
+    setTileData(getTileProps())
+
+  }
+
+
+
+  if (
+    [
+      tileCorners,
+      tileData,
+    ].includes(null)
+  ) { return <></> }
+
+
+  console.log(tileCorners[0]);
+  console.log(tileData[0]);
+
+  return (
+    <div className='Board'>
+      {
+        nestedIds.map((r) => {
+          return (
+            <div className='Row'>
+              {
+                r.map((id) => {
+                  return (
+                    <Tile 
+                      data={tileData[id]}
+                      corners={tileCorners[id]}
+                    />
+                  )
+                })
+              }
+
+            </div>
+          )
+        })
+      }
+
+    </div>
+  )
+}
+
+
+function Tile({
+  corners,
+  data
+}) {
+
+  const [d, setD] = useState(null)
+  const [active, setActive] = useState(true)
+  
+  useEffect(() => {
+    setD(data)
+    if (centerTileIds.includes(data.id)) {
+      setActive(false)
+    }
+  },[data])
+
+
+  if (d === null) {
+    return <></>
+  }
+
+  if (!active) {
+    return(
+      <div className='Tile' style={{backgroundColor : 'black'}}></div>
+    )
+  }
+
+
+  return(
+    <div className='Tile'>
+      <div style={{display : 'flex', width : '100%', height : '10%'}}>
+        <div className='TileCorner' style={{backgroundColor : corners[0]}}></div>
+        <div style={{backgroundColor : d.sides[0], width : '80%', height : '100%'}}></div>
+        <div className='TileCorner' style={{backgroundColor : corners[1]}}></div>
+      </div>
+      <div style={{display : 'flex', width : '100%', height : '80%'}}>
+        <div style={{backgroundColor : d.sides[3], width : '10%', height : '100%'}}></div>
+        <div style={{backgroundColor : d.center, width : '80%', height : '100%', display : 'flex'}}>
+          <span style={{margin : 'auto'}}>
+            {d.id}
+
+          </span>
+
+        </div>
+        <div style={{backgroundColor : d.sides[1], width : '10%', height : '100%'}}></div>
+      </div>
+      <div style={{display : 'flex', width : '100%', height : '10%'}}>
+        <div className='TileCorner' style={{backgroundColor : corners[3]}}></div>
+          <div style={{backgroundColor : d.sides[2], width : '80%', height : '100%'}}></div>
+        <div className='TileCorner' style={{backgroundColor : corners[2]}}></div>
+      </div>
+    </div>
+
+
+  )
+  
+}
+
+
+
+
+/* 
 export default function Board({
 
 }) {
@@ -220,3 +353,4 @@ function Piece({
 
 
 
+ */

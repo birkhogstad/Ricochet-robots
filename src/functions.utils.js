@@ -2,12 +2,13 @@
 
 export const rowLength = 16
 
-export const centerTileIds = [103, 104, 119, 120]
+export const centerTileIds = [119, 120, 135, 136]
 
+export const colors = ['blue', 'red', 'green', 'yellow']
 
 
 export function getNextOffset() {
-  return [-16, 1, 16, -1]
+  return [- rowLength, 1, rowLength, -1]
 }
 
 

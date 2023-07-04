@@ -4,6 +4,8 @@ import { centerTileIds, getNextOffset, rowLength } from "../../functions.utils"
 
 
 let tiles = []
+let pieces = []
+let goals = []
 
 
 
@@ -12,17 +14,17 @@ export function initiateTiles() {
 
   let nextOffset = getNextOffset()
   let id = 0
-  for(let i = 0; i < 16; i++) {
-    for (let j = 0; j < 16; j++) {
+  for(let i = 0; i < rowLength; i++) {
+    for (let j = 0; j < rowLength; j++) {
       
       let t = {
         id : id,
         next : nextOffset.map((offset) => id + offset),
         wall : [
           j,
-          15 + (i * 16),
-          240 + j,
-          i * 16,
+          (rowLength - 1) + (i * rowLength),
+          rowLength * (rowLength) + j,
+          i * rowLength,
         ],
       }
 
@@ -38,7 +40,7 @@ export function initiateTiles() {
         t.wall[1] = null
       }
 
-      if (t.next[3] % rowLength === 15) {
+      if (t.next[3] % rowLength === (rowLength - 1)) {
         t.next[3] = null
         t.wall[3] = null
       }
@@ -63,27 +65,19 @@ export function initiateTiles() {
       tile.wall[i] = null
     }
   })
-
-
-
-
-
   console.log(tiles);
+
+  initiateGoals()
   return tiles
 
 }
 
 
 function setWall(id, index) {
-
-
   tiles[id].next[index] = null
   tiles[id].wall[index] = null
-
-
   let t = tiles[id].next[(index + 2) % 4]
   while(t !== null) {
-
     let tile = tiles[t]
     let foo = []
     for (let i = 0; i < tile.wall.length; i++) {
@@ -98,3 +92,168 @@ function setWall(id, index) {
     t = tiles[t].next[(index + 2) % 4]
   }
 }
+
+function wallBetween(a, b) {
+  console.log(a, b);
+  if (a === null || b === null) {
+    return
+  }
+  for (let i = 0; i < 4; i++) {
+    if (tiles[a].next[i] === b) {
+      setWall(a, i)
+      setWall(b, (i + 2) % 4)
+      return
+    }
+  }
+}
+
+
+function initiateGoals() {
+
+
+
+
+  goals = []
+  let g = [
+    {
+      id : 99,
+      walls : [
+        3, 2
+      ]
+    },
+    {
+      id : 20,
+      walls : [
+        0, 3
+      ]
+    },
+    {
+      id : 33,
+      walls : [
+        0, 1
+      ]
+    },
+    {
+      id : 54,
+      walls : [
+        1, 2
+      ]
+    },
+
+
+    {
+      id : 41,
+      walls : [
+        1, 2
+      ]
+    },
+    {
+      id : 29,
+      walls : [
+        0, 3
+      ]
+    },
+    {
+      id : 94,
+      walls : [
+        2, 3
+      ]
+    },
+    {
+      id : 107,
+      walls : [
+        0, 1
+      ]
+    },
+
+
+    {
+      id : 145,
+      walls : [
+        1, 2
+      ]
+    },
+    {
+      id : 213,
+      walls : [
+        0, 1
+      ]
+    },
+    {
+      id : 164,
+      walls : [
+        2, 3
+      ]
+    },
+    {
+      id : 227,
+      walls : [
+        0, 3
+      ]
+    },
+
+
+    {
+      id : 218,
+      walls : [
+        0, 3
+      ]
+    },
+    {
+      id : 168,
+      walls : [
+        0, 1
+      ]
+    },
+    {
+      id : 189,
+      walls : [
+        2, 3
+      ]
+    },
+    {
+      id : 158,
+      walls : [
+        1, 2
+      ]
+    },
+  ]
+
+  let walls = [
+    [1,2],
+    [80, 96],
+
+    [11, 12],
+    [63, 79],
+
+    [176, 192],
+    [246, 247],
+
+    [175, 191],
+    [251, 252]
+  ]
+
+  g.map((e) => {
+    goals.push(e.id)
+    e.walls.map((i) => {
+      wallBetween(e.id, tiles[e.id].next[i])
+    })    
+  })
+
+
+  console.log(goals);
+
+  walls.map((w) => {
+    wallBetween(w[0], w[1])
+  })
+
+}
+
+
+export function setPiecesLocation() {
+
+  pieces = [68]
+  return pieces
+}
+
+

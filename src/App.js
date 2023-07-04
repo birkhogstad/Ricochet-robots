@@ -1,8 +1,4 @@
 import React from "react";
-import Grid from "./components/Grid";
-import { getInitialTiles, getWalls } from "./functions";
-import StateDisplay from "./components/StateDisplay";
-import Hub from "./components/Hub";
 import Board from "./components/board/Board";
 
 

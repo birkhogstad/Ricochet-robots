@@ -9,7 +9,13 @@
   display: flex;
 }
 
-
+.TileButton {
+  background-color: inherit;
+  padding: 0;
+  border: 0;
+  margin: auto;
+  display: flex;
+}
 
 
 

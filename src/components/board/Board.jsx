@@ -3,7 +3,7 @@ import { centerTileIds, colors, rowLength } from '../../functions.utils';
 
 
 import './Board.style.css';
-import { getTileCorners, getTileProps, pieceSelected } from './functions.Board';
+import { getTileCorners, getTileProps, handleTileClick, initialGameState, pieceSelected } from './functions.Board';
 
 
 export default function Board({
@@ -34,7 +34,17 @@ export default function Board({
     setNestedIds(ids)
 
     setTileCorners(getTileCorners())
-    setTileData(pieceSelected(1))
+    setTileData(initialGameState())
+
+  }
+
+  function clicked(id) {
+    console.log(id);
+
+    let resp = handleTileClick(id)
+    if (resp !== null) {
+      setTileData(resp)
+    }
 
   }
 
@@ -59,6 +69,7 @@ export default function Board({
                     <Tile 
                       data={tileData[id]}
                       corners={tileCorners[id]}
+                      click={clicked}
                     />
                   )
                 })
@@ -68,7 +79,6 @@ export default function Board({
           )
         })
       }
-
     </div>
   )
 }
@@ -76,7 +86,8 @@ export default function Board({
 
 function Tile({
   corners,
-  data
+  data,
+  click,
 }) {
 
   const [d, setD] = useState(null)
@@ -120,7 +131,14 @@ function Tile({
       <div style={{display : 'flex', width : '100%', height : '80%'}}>
         <div style={{backgroundColor : d.sides[3], width : '10%', height : '100%'}}></div>
         <div style={{backgroundColor : d.center, width : '80%', height : '100%', display : 'flex'}}>
-          {child}
+          <button 
+            className='TileButton'
+            type='button'
+            onClick={(e) => click(d.id)}
+          >
+            {child}
+
+          </button>
         </div>
         <div style={{backgroundColor : d.sides[1], width : '10%', height : '100%'}}></div>
       </div>

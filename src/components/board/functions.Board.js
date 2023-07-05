@@ -6,12 +6,184 @@ import { centerTileIds, colors, getNextOffset, lightColors, rowLength } from "..
 let tiles = []
 let pieces = []
 let goals = []
+let tileId = null
+let moveEndPoints = []
 
 let tileProps = []
+let moveHistory = []
 
 
 
 function initiateBoard() {
+  
+  function setWall(id, index) {
+    tiles[id].next[index] = null
+    tiles[id].wall[index] = null
+    let t = tiles[id].next[(index + 2) % 4]
+    while(t !== null) {
+      let tile = tiles[t]
+      let foo = []
+      for (let i = 0; i < tile.wall.length; i++) {
+        let bar = tile.wall[i]
+        if (i === index) {
+          bar = id
+        }
+        foo.push(bar)
+      }
+      tile.wall = foo.slice()
+      tiles[t] = tile
+      t = tiles[t].next[(index + 2) % 4]
+    }
+  }
+  function wallBetween(a, b) {
+    if (a === null || b === null) {
+      return
+    }
+    for (let i = 0; i < 4; i++) {
+      if (tiles[a].next[i] === b) {
+        setWall(a, i)
+        setWall(b, (i + 2) % 4)
+        return
+      }
+    }
+  }
+  function initiateGoals() {
+  
+    goals = []
+    let g = [
+      {
+        id : 99,
+        walls : [
+          3, 2
+        ]
+      },
+      {
+        id : 20,
+        walls : [
+          0, 3
+        ]
+      },
+      {
+        id : 33,
+        walls : [
+          0, 1
+        ]
+      },
+      {
+        id : 54,
+        walls : [
+          1, 2
+        ]
+      },
+  
+  
+      {
+        id : 41,
+        walls : [
+          1, 2
+        ]
+      },
+      {
+        id : 29,
+        walls : [
+          0, 3
+        ]
+      },
+      {
+        id : 94,
+        walls : [
+          2, 3
+        ]
+      },
+      {
+        id : 107,
+        walls : [
+          0, 1
+        ]
+      },
+  
+  
+      {
+        id : 145,
+        walls : [
+          1, 2
+        ]
+      },
+      {
+        id : 213,
+        walls : [
+          0, 1
+        ]
+      },
+      {
+        id : 164,
+        walls : [
+          2, 3
+        ]
+      },
+      {
+        id : 227,
+        walls : [
+          0, 3
+        ]
+      },
+  
+  
+      {
+        id : 218,
+        walls : [
+          0, 3
+        ]
+      },
+      {
+        id : 168,
+        walls : [
+          0, 1
+        ]
+      },
+      {
+        id : 189,
+        walls : [
+          2, 3
+        ]
+      },
+      {
+        id : 158,
+        walls : [
+          1, 2
+        ]
+      },
+    ]
+  
+    let walls = [
+      [1,2],
+      [80, 96],
+  
+      [11, 12],
+      [63, 79],
+  
+      [176, 192],
+      [246, 247],
+  
+      [175, 191],
+      [251, 252]
+    ]
+  
+    g.map((e) => {
+      goals.push(e.id)
+      e.walls.map((i) => {
+        wallBetween(e.id, tiles[e.id].next[i])
+      })    
+    })
+  
+  
+    walls.map((w) => {
+      wallBetween(w[0], w[1])
+    })
+  
+  }
+
+
   let nextOffset = getNextOffset()
   let id = 0
   for(let i = 0; i < rowLength; i++) {
@@ -27,19 +199,19 @@ function initiateBoard() {
           i * rowLength,
         ],
       }
-
+      
       for (let i = 0; i < t.next.length; i++) {
         if (t.next[i] < 0 || t.next[i] >= rowLength * rowLength) {
           t.next[i] = null
           t.wall[i] = null
         }
       }
-
+      
       if ((t.next[1]) % rowLength === 0) {
         t.next[1] = null
         t.wall[1] = null
       }
-
+      
       if (t.next[3] % rowLength === (rowLength - 1)) {
         t.next[3] = null
         t.wall[3] = null
@@ -48,9 +220,9 @@ function initiateBoard() {
       id++
     }
   }
-
+  
   let centerIds = centerTileIds
-
+  
 
   centerIds.map((t) => {
     let tile = tiles[t]
@@ -86,175 +258,49 @@ function initiateBoard() {
 }
 
 
-function setWall(id, index) {
-  tiles[id].next[index] = null
-  tiles[id].wall[index] = null
-  let t = tiles[id].next[(index + 2) % 4]
-  while(t !== null) {
-    let tile = tiles[t]
-    let foo = []
-    for (let i = 0; i < tile.wall.length; i++) {
-      let bar = tile.wall[i]
-      if (i === index) {
-        bar = id
-      }
-      foo.push(bar)
-    }
-    tile.wall = foo.slice()
-    tiles[t] = tile
-    t = tiles[t].next[(index + 2) % 4]
+
+export function handleTileClick(id) {
+
+  if (pieces.includes(id)) {
+    tileId = id
+    return getPieceMovementProps(pieces.indexOf(id))
   }
+  if (moveEndPoints.includes(id) && tileId !== null) {
+    pieces[pieces.indexOf(tileId)] = id
+    tileId = null
+    moveEndPoints = []
+
+    return addPiecesToProps(getCleanTileProps())
+  }
+  return tileProps
+
 }
 
-function wallBetween(a, b) {
-  if (a === null || b === null) {
-    return
-  }
-  for (let i = 0; i < 4; i++) {
-    if (tiles[a].next[i] === b) {
-      setWall(a, i)
-      setWall(b, (i + 2) % 4)
-      return
-    }
-  }
+export function initialGameState() {
+  moveHistory = []
+  return getTileProps()
 }
 
 
-function initiateGoals() {
 
-  goals = []
-  let g = [
-    {
-      id : 99,
-      walls : [
-        3, 2
-      ]
-    },
-    {
-      id : 20,
-      walls : [
-        0, 3
-      ]
-    },
-    {
-      id : 33,
-      walls : [
-        0, 1
-      ]
-    },
-    {
-      id : 54,
-      walls : [
-        1, 2
-      ]
-    },
-
-
-    {
-      id : 41,
-      walls : [
-        1, 2
-      ]
-    },
-    {
-      id : 29,
-      walls : [
-        0, 3
-      ]
-    },
-    {
-      id : 94,
-      walls : [
-        2, 3
-      ]
-    },
-    {
-      id : 107,
-      walls : [
-        0, 1
-      ]
-    },
-
-
-    {
-      id : 145,
-      walls : [
-        1, 2
-      ]
-    },
-    {
-      id : 213,
-      walls : [
-        0, 1
-      ]
-    },
-    {
-      id : 164,
-      walls : [
-        2, 3
-      ]
-    },
-    {
-      id : 227,
-      walls : [
-        0, 3
-      ]
-    },
-
-
-    {
-      id : 218,
-      walls : [
-        0, 3
-      ]
-    },
-    {
-      id : 168,
-      walls : [
-        0, 1
-      ]
-    },
-    {
-      id : 189,
-      walls : [
-        2, 3
-      ]
-    },
-    {
-      id : 158,
-      walls : [
-        1, 2
-      ]
-    },
-  ]
-
-  let walls = [
-    [1,2],
-    [80, 96],
-
-    [11, 12],
-    [63, 79],
-
-    [176, 192],
-    [246, 247],
-
-    [175, 191],
-    [251, 252]
-  ]
-
-  g.map((e) => {
-    goals.push(e.id)
-    e.walls.map((i) => {
-      wallBetween(e.id, tiles[e.id].next[i])
-    })    
+function getCleanTileProps() {
+  let foo = []
+  tiles.map((t) => {
+    let p = {
+      id : t.id,
+      center : 'inherit',
+      sides : [],
+      event : null,
+    }
+    t.next.map((n) => {
+      p.sides.push(n === null ? 'black' : 'inherit')
+    })
+    foo.push(p)
   })
 
-
-  walls.map((w) => {
-    wallBetween(w[0], w[1])
-  })
-
+  return addPiecesToProps(foo)
 }
+
 
 
 
@@ -368,6 +414,36 @@ function addPiecesToProps(props = null, p = null) {
   return data
 }
 
+function getPieceMovementProps(pieceId) {
+
+  let id = pieces[pieceId]
+  let moves = findPieceMoves(pieceId)
+
+
+  let props = getCleanTileProps()
+
+  props[id].center = lightColors[pieceId]
+  console.log(moves);
+  moveEndPoints = []
+  for (let i = 0; i < 4; i++) {
+    let p = moves[i]
+    if (p.length ===  0) {
+      continue
+    }
+    moveEndPoints.push(p[p.length - 1])
+    let tile = id
+    for (let j = 0; j < p.length; j++) {
+      props[tile].sides[i] = lightColors[pieceId]
+      tile = p[j]
+      props[tile].sides[(i + 2) % 4] = lightColors[pieceId]
+      props[tile].center = lightColors[pieceId]
+    }
+    props[tile].center = colors[pieceId]
+
+  }
+  console.log(moveEndPoints);
+  return props
+}
 
 
 export function pieceSelected(pieceId) {
@@ -379,7 +455,7 @@ export function pieceSelected(pieceId) {
   let moves = findPieceMoves(pieceId)
 
 
-  let props = getTileProps().slice()
+  let props = getCleanTileProps()
 
   props[id].center = lightColors[pieceId]
   console.log(moves);
@@ -399,9 +475,6 @@ export function pieceSelected(pieceId) {
 
   }
   return props
-
-
-
 }
 
 

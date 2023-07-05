@@ -1,11 +1,166 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { initiateTiles } from './functions.Board';
 import { centerTileIds, colors, rowLength } from '../../functions.utils';
 
 
 import './Board.style.css';
+import { getTileCorners, getTileProps, pieceSelected } from './functions.Board';
 
 
+export default function Board({
+
+}) {
+
+  const [nestedIds, setNestedIds] = useState(null)
+
+  const [tileCorners, setTileCorners] = useState(null)
+  const [tileData, setTileData] = useState(null)
+  
+  useEffect(() => {
+    getInitialBoard()
+  },[])
+
+
+  function getInitialBoard() {
+    let ids = []
+    let id = 0
+    for (let i = 0; i < 16; i++) {
+      let row = []
+      for (let j = 0; j < 16; j++) {
+        row.push(id)
+        id++
+      }
+      ids.push(row)
+    }
+    setNestedIds(ids)
+
+    setTileCorners(getTileCorners())
+    setTileData(pieceSelected(1))
+
+  }
+
+
+
+  if (
+    [
+      tileCorners,
+      tileData,
+    ].includes(null)
+  ) { return <></> }
+
+  return (
+    <div className='Board'>
+      {
+        nestedIds.map((r) => {
+          return (
+            <div className='Row'>
+              {
+                r.map((id) => {
+                  return (
+                    <Tile 
+                      data={tileData[id]}
+                      corners={tileCorners[id]}
+                    />
+                  )
+                })
+              }
+
+            </div>
+          )
+        })
+      }
+
+    </div>
+  )
+}
+
+
+function Tile({
+  corners,
+  data
+}) {
+
+  const [d, setD] = useState(null)
+  const [active, setActive] = useState(true)
+  const [child, setChild] = useState(null)
+  
+  useEffect(() => {
+    setD(data)
+    if (centerTileIds.includes(data.id)) {
+      setActive(false)
+    }
+
+    if (data.event === null) {
+      setChild ((<span style={{margin : 'auto', fontSize : '10px'}}>{data.id}</span>))
+    }
+    if (data.event !== null) {
+      setChild ((<Piece color={colors[data.event]} />))
+    }
+
+  },[data])
+
+
+  if (d === null) {
+    return <></>
+  }
+
+  if (!active) {
+    return(
+      <div className='Tile' style={{backgroundColor : 'black'}}></div>
+    )
+  }
+
+
+  return(
+    <div className='Tile'>
+      <div style={{display : 'flex', width : '100%', height : '10%'}}>
+        <div className='TileCorner' style={{backgroundColor : corners[0]}}></div>
+        <div style={{backgroundColor : d.sides[0], width : '80%', height : '100%'}}></div>
+        <div className='TileCorner' style={{backgroundColor : corners[1]}}></div>
+      </div>
+      <div style={{display : 'flex', width : '100%', height : '80%'}}>
+        <div style={{backgroundColor : d.sides[3], width : '10%', height : '100%'}}></div>
+        <div style={{backgroundColor : d.center, width : '80%', height : '100%', display : 'flex'}}>
+          {child}
+        </div>
+        <div style={{backgroundColor : d.sides[1], width : '10%', height : '100%'}}></div>
+      </div>
+      <div style={{display : 'flex', width : '100%', height : '10%'}}>
+        <div className='TileCorner' style={{backgroundColor : corners[3]}}></div>
+          <div style={{backgroundColor : d.sides[2], width : '80%', height : '100%'}}></div>
+        <div className='TileCorner' style={{backgroundColor : corners[2]}}></div>
+      </div>
+    </div>
+
+
+  )
+  
+}
+
+
+function Piece({
+  color = "red",
+}) {
+
+  const [c, setC] = useState(null)
+
+  useEffect(() => {
+    setC(color)
+  }, [])
+
+
+  return (
+    <svg width="40" height="40" className='Piece'>
+      <circle cx="20" cy="20" r="16" fill={'black'} />
+      <circle cx="20" cy="20" r="14" fill={c} />
+    </svg>
+  )
+  
+  
+}
+
+
+
+/* 
 export default function Board({
 
 }) {
@@ -220,3 +375,4 @@ function Piece({
 
 
 
+ */

@@ -3,7 +3,7 @@ import { centerTileIds, colors, rowLength } from '../../functions.utils';
 
 
 import './Board.style.css';
-import { getTileCorners, getTileProps } from './functions.Board';
+import { getTileCorners, getTileProps, pieceSelected } from './functions.Board';
 
 
 export default function Board({
@@ -34,7 +34,7 @@ export default function Board({
     setNestedIds(ids)
 
     setTileCorners(getTileCorners())
-    setTileData(getTileProps())
+    setTileData(pieceSelected(1))
 
   }
 
@@ -46,10 +46,6 @@ export default function Board({
       tileData,
     ].includes(null)
   ) { return <></> }
-
-
-  console.log(tileCorners[0]);
-  console.log(tileData[0]);
 
   return (
     <div className='Board'>
@@ -85,12 +81,21 @@ function Tile({
 
   const [d, setD] = useState(null)
   const [active, setActive] = useState(true)
+  const [child, setChild] = useState(null)
   
   useEffect(() => {
     setD(data)
     if (centerTileIds.includes(data.id)) {
       setActive(false)
     }
+
+    if (data.event === null) {
+      setChild ((<span style={{margin : 'auto', fontSize : '10px'}}>{data.id}</span>))
+    }
+    if (data.event !== null) {
+      setChild ((<Piece color={colors[data.event]} />))
+    }
+
   },[data])
 
 
@@ -115,11 +120,7 @@ function Tile({
       <div style={{display : 'flex', width : '100%', height : '80%'}}>
         <div style={{backgroundColor : d.sides[3], width : '10%', height : '100%'}}></div>
         <div style={{backgroundColor : d.center, width : '80%', height : '100%', display : 'flex'}}>
-          <span style={{margin : 'auto'}}>
-            {d.id}
-
-          </span>
-
+          {child}
         </div>
         <div style={{backgroundColor : d.sides[1], width : '10%', height : '100%'}}></div>
       </div>
@@ -135,6 +136,27 @@ function Tile({
   
 }
 
+
+function Piece({
+  color = "red",
+}) {
+
+  const [c, setC] = useState(null)
+
+  useEffect(() => {
+    setC(color)
+  }, [])
+
+
+  return (
+    <svg width="40" height="40" className='Piece'>
+      <circle cx="20" cy="20" r="16" fill={'black'} />
+      <circle cx="20" cy="20" r="14" fill={c} />
+    </svg>
+  )
+  
+  
+}
 
 
 

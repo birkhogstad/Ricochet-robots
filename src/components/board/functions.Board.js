@@ -1,4 +1,4 @@
-import { centerTileIds, getNextOffset, rowLength } from "../../functions.utils"
+import { centerTileIds, colors, getNextOffset, lightColors, rowLength } from "../../functions.utils"
 
 
 
@@ -69,14 +69,20 @@ function initiateBoard() {
   initiateGoals()
 
 
-
-  getTileProps()
-
+  let invalidIds = goals.concat(centerIds)
 
 
-  console.log(getTileCorners());
+  pieces = []
+  while (pieces.length !== colors.length) {
+    let id = Math.floor((Math.random()*tiles.length))
+    if (! invalidIds.includes(id)) {
+      invalidIds.push(id)
+      pieces.push(id)
+    }
+  }
+  
+  findPieceMoves(1);
 
-  return tiles
 }
 
 
@@ -265,6 +271,7 @@ export function getTileProps() {
         id : t.id,
         center : 'inherit',
         sides : [],
+        event : null,
       }
       t.next.map((n) => {
         p.sides.push(n === null ? 'black' : 'inherit')
@@ -278,7 +285,7 @@ export function getTileProps() {
     setTileProps()
   }
   console.log(tileProps);
-  return tileProps
+  return addPiecesToProps(tileProps)
 }
 
 
@@ -344,14 +351,116 @@ export function getTileCorners() {
 }
 
 
+function addPiecesToProps(props = null, p = null) {
+  if (props === null) {
+    props = getTileProps()
+  }
+  let data = props.slice()
 
+  if (p === null) {
+    p = pieces.slice()
+  }
 
+  p.map((id) => {
+    data[id].event = p.indexOf(id)
+  })
 
-
-export function setPiecesLocation() {
-
-  pieces = [68]
-  return pieces
+  return data
 }
+
+
+
+export function pieceSelected(pieceId) {
+  if (tiles.length === 0) {
+    initiateBoard()
+  }
+
+  let id = pieces[pieceId]
+  let moves = findPieceMoves(pieceId)
+
+
+  let props = getTileProps().slice()
+
+  props[id].center = lightColors[pieceId]
+  console.log(moves);
+  for (let i = 0; i < 4; i++) {
+    let p = moves[i]
+    if (p.length ===  0) {
+      continue
+    }
+    let tile = id
+    for (let j = 0; j < p.length; j++) {
+      props[tile].sides[i] = lightColors[pieceId]
+      tile = p[j]
+      props[tile].sides[(i + 2) % 4] = lightColors[pieceId]
+      props[tile].center = lightColors[pieceId]
+    }
+    props[tile].center = colors[pieceId]
+
+  }
+  return props
+
+
+
+}
+
+
+function findPieceMoves(pieceId, piecesLocation = pieces) {
+  let id = piecesLocation[pieceId]
+  let t = tiles[id]
+  let moves = getTileRoute(id).slice()
+  console.log(moves);
+  console.log(piecesLocation);
+
+
+  for (let i = 0; i < piecesLocation.length; i++) {
+    if (i === pieceId) {
+      continue
+    }
+    let pId = piecesLocation[i]
+    moves.map((d) => {
+      if (d.includes(pId)) {
+        let foo = []
+        let found = false
+        d.map((tile) => {
+          if (!found) {
+            if (tile === pId) {
+              found = true
+            } else {
+              foo.push(tile)
+            }
+          }
+        })
+        moves[moves.indexOf(d)] = foo.slice()
+      }
+    })
+    
+    
+  }
+  return moves
+}
+
+
+function getTileRoute(id) {
+  console.log(id);
+  
+  let moves = []
+  let t = tiles[id]
+
+  for (let i = 0; i < t.next.length; i++) {
+    let dir = []
+    let n = t.next[i]
+    while (n !== null) {
+      dir.push(n)
+      n = tiles[n].next[i]
+    }
+    moves.push(dir)
+  }
+  return moves
+
+}
+
+
+
 
 

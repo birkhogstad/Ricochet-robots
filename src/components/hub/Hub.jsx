@@ -5,7 +5,7 @@ import Board from '../board/Board';
 import './Hub.style.css';
 import { robots } from '../../functions.utils';
 import Piece from '../util/Piece';
-import { handleDirectionEvent, initialGameState, pieceIdSelected } from '../board/functions.Board';
+import { handleDirectionEvent, initialGameState, initialProps, pieceIdSelected } from '../board/functions.Board';
 
 
 export default function Hub({
@@ -20,7 +20,7 @@ export default function Hub({
 
 
   useEffect(() => {
-    setTileData(initialGameState())
+    setTileData(initialProps())
   }, []);
 
 /* 
@@ -94,12 +94,16 @@ export default function Hub({
         pieceSelectorEvent(e.keyCode - 49)
         return;
       case 65:
+      case 37:
         value++;
       case 83:
+      case 40:
         value++;
       case 68:
+      case 39:
         value++;
       case 87:
+      case 38:
         directionMoveEvent(value)
         return;
 

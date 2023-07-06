@@ -262,16 +262,10 @@ function initiateBoard() {
 
 }
 
-function completeMove(pieceId) {
-  pieces[pieceId] = tileId
-  tileId = null
-  moveEndPoints = []
-  
-}
-
-
-function initialProps(includePieces = true, p = null) {
-
+export function initialProps(includePieces = true, p = null) {
+  if (tiles.length === 0) {
+    initiateBoard()
+  }
   let foo = []
   tiles.map((t) => {
     let p = {
@@ -285,7 +279,6 @@ function initialProps(includePieces = true, p = null) {
     })
     foo.push(p)
   })
-
   if (includePieces) {
     if (p === null) {
       p = pieces
@@ -296,8 +289,6 @@ function initialProps(includePieces = true, p = null) {
   }
   return foo
 }
-
-
 
 
 
@@ -342,21 +333,6 @@ export function handleTileClick(id) {
 }
 
 
-export function pieceIdSelected(pieceId) {
-  tileId = pieces[pieceId]
-  return getPieceMovementProps(pieceId)
-}
-
-export function initialGameState() {
-  if (tiles.length === 0) {
-    initiateBoard()
-  }
-
-  moveHistory = []
-  return initialProps()
-}
-
-
 
 
 
@@ -379,17 +355,6 @@ export function getTileCorners() {
         c[(i + 1) % 4] = 'black'
       }
 
-  /*     
-      let bar = 'inherit'
-      let index = [i, 3 - i]
-      let ids = [t.next[index[0]], t.next[index[1]]]
-      if (ids[0] === null || ids[1] === null) {
-        bar = 'black'
-      } else if (tiles[ids[0]].next[index[1]] === null && tiles[ids[1]].next[index[0]] === null){
-        bar = 'black'
-      }
-      c.push(bar)
- */
     }
     loop:
     for (let i = 0; i < 4; i++) {
@@ -421,71 +386,6 @@ export function getTileCorners() {
 
 }
 
-
-
-function getPieceMovementProps(pieceId) {
-
-  let id = pieces[pieceId]
-  let moves = findPieceMoves(pieceId)
-
-
-  let props = initialProps()
-
-  props[id].center = getColorStrength(pieceId, 6)
-  console.log(moves);
-  moveEndPoints = []
-  for (let i = 0; i < 4; i++) {
-    let p = moves[i]
-    if (p.length ===  0) {
-      moveEndPoints.push(null)
-      continue
-    }
-    moveEndPoints.push(p[p.length - 1])
-    let tile = id
-    for (let j = 0; j < p.length; j++) {
-      props[tile].sides[i] = getColorStrength(pieceId, 6)
-      tile = p[j]
-      props[tile].sides[(i + 2) % 4] = getColorStrength(pieceId, 6)
-      props[tile].center = getColorStrength(pieceId, 6)
-    }
-    props[tile].center = getColorStrength(pieceId, 3)
-
-  }
-  console.log(moveEndPoints);
-  return props
-}
-
-
-export function pieceSelected(pieceId) {
-  if (tiles.length === 0) {
-    initiateBoard()
-  }
-
-  let id = pieces[pieceId]
-  let moves = findPieceMoves(pieceId)
-
-
-  let props = initialProps()
-
-  props[id].center = lightColors[pieceId]
-  console.log(moves);
-  for (let i = 0; i < 4; i++) {
-    let p = moves[i]
-    if (p.length ===  0) {
-      continue
-    }
-    let tile = id
-    for (let j = 0; j < p.length; j++) {
-      props[tile].sides[i] = lightColors[pieceId]
-      tile = p[j]
-      props[tile].sides[(i + 2) % 4] = lightColors[pieceId]
-      props[tile].center = lightColors[pieceId]
-    }
-    props[tile].center = colors[pieceId]
-
-  }
-  return props
-}
 
 
 function findPieceMoves(pieceId, piecesLocation = pieces) {
@@ -538,6 +438,28 @@ function getTileRoute(id) {
 }
 
 
+export function pieceIdSelected(pieceId) {
+  tileId = pieces[pieceId]
+  let moves = findPieceMoves(pieceId)
+  let props = initialProps()
+  props[tileId].center = getColorStrength(pieceId, 6)
+  moveEndPoints = []
+  for (let i = 0; i < 4; i++) {
+    let p = moves[i]
+    if (p.length ===  0) {
+      moveEndPoints.push(null)
+      continue
+    }
+    moveEndPoints.push(p[p.length - 1])
+    let tile = tileId
+    for (let j = 0; j < p.length; j++) {
+      props[tile].sides[i] = getColorStrength(pieceId, 6)
+      tile = p[j]
+      props[tile].sides[(i + 2) % 4] = getColorStrength(pieceId, 6)
+      props[tile].center = getColorStrength(pieceId, 6)
+    }
+    props[tile].center = getColorStrength(pieceId, 3)
 
-
-
+  }
+  return props
+}

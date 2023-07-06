@@ -4,6 +4,7 @@ import { centerTileIds, colors, rowLength } from '../../functions.utils';
 
 import './Board.style.css';
 import { getTileCorners, getTileProps, handleTileClick, initialGameState, pieceSelected } from './functions.Board';
+import Piece from '../Piece';
 
 
 export default function Board({
@@ -104,7 +105,7 @@ function Tile({
       setChild ((<span style={{margin : 'auto', fontSize : '10px'}}>{data.id}</span>))
     }
     if (data.event !== null) {
-      setChild ((<Piece color={colors[data.event]} />))
+      setChild ((<Piece id={data.event} />))
     }
 
   },[data])
@@ -119,8 +120,6 @@ function Tile({
       <div className='Tile' style={{backgroundColor : 'black'}}></div>
     )
   }
-
-
   return(
     <div className='Tile'>
       <div style={{display : 'flex', width : '100%', height : '10%'}}>
@@ -155,26 +154,6 @@ function Tile({
 }
 
 
-function Piece({
-  color = "red",
-}) {
-
-  const [c, setC] = useState(null)
-
-  useEffect(() => {
-    setC(color)
-  }, [])
-
-
-  return (
-    <svg width="40" height="40" className='Piece'>
-      <circle cx="20" cy="20" r="16" fill={'black'} />
-      <circle cx="20" cy="20" r="14" fill={c} />
-    </svg>
-  )
-  
-  
-}
 
 
 

@@ -8,8 +8,35 @@ export const colors = ['blue', 'red', 'green', 'yellow']
 export const lightColors = ['lightblue', 'lightcoral', 'lightgreen', 'lightyellow']
 
 
+const col = [
+
+  [0, 0, 255],
+  [255, 0, 0],
+  [0, 255, 0],
+  [255, 255, 0],
+]
+
+
 export function getNextOffset() {
   return [- rowLength, 1, rowLength, -1]
 }
+
+
+export function getColorBase(index) {
+  return col[index]
+}
+
+export function getPieceColor(index) {
+  return getColorString(getColorBase(index))
+}
+
+
+function getColorString(arr) {
+  let r = arr[0]
+  let g = arr[1]
+  let b = arr[2]
+  return 'rgb(' + r + ', ' + g + ', ' + b  + ')'
+}
+
 
 

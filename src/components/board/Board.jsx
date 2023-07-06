@@ -8,27 +8,18 @@ import Piece from '../util/Piece';
 
 
 export default function Board({
-  dimensions
+  dimensions,
+  tileData,
+
 }) {
   const [s, setS] = useState(null)
 
   const [nestedIds, setNestedIds] = useState(null)
 
   const [tileCorners, setTileCorners] = useState(null)
-  const [tileData, setTileData] = useState(null)
+  const [data, setData] = useState(null)
   
   useEffect(() => {
-    getInitialBoard()
-  },[])
-
-  useEffect(() => {
-    let foo = Math.floor(Math.min(dimensions.width, Math.floor(dimensions.height * 0.8)) / rowLength)
-    setS(Math.max(foo, 50))
-    console.log(foo);
-  },[dimensions])
-
-
-  function getInitialBoard() {
     let ids = []
     let id = 0
     for (let i = 0; i < 16; i++) {
@@ -42,15 +33,25 @@ export default function Board({
     setNestedIds(ids)
 
     setTileCorners(getTileCorners())
-    setTileData(initialGameState())
-  }
+  },[])
+
+  useEffect(() => {
+    setData(tileData)
+  },[tileData])
+
+  useEffect(() => {
+    let foo = Math.floor(Math.min(dimensions.width, Math.floor(dimensions.height * 0.8)) / rowLength)
+    setS(Math.max(foo, 50))
+    console.log(foo);
+  },[dimensions])
+
 
   function clicked(id) {
     console.log(id);
 
     let resp = handleTileClick(id)
     if (resp !== null) {
-      setTileData(resp)
+      setData(resp)
     }
 
   }
@@ -60,7 +61,7 @@ export default function Board({
   if (
     [
       tileCorners,
-      tileData,
+      data,
     ].includes(null)
   ) { return <></> }
 
@@ -74,7 +75,7 @@ export default function Board({
                 r.map((id) => {
                   return (
                     <Tile 
-                      data={tileData[id]}
+                      data={data[id]}
                       corners={tileCorners[id]}
                       click={clicked}
                       sideSize={s}

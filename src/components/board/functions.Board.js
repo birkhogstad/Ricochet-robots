@@ -262,36 +262,16 @@ function initiateBoard() {
 
 }
 
-
-
-export function handleTileClick(id) {
-
-  if (pieces.includes(id)) {
-    tileId = id
-
-    
-
-    return getPieceMovementProps(pieces.indexOf(id))
-  }
-  if (moveEndPoints.includes(id) && tileId !== null) {
-    pieces[pieces.indexOf(tileId)] = id
-    tileId = null
-    moveEndPoints = []
-
-    return addPiecesToProps(getCleanTileProps())
-  }
-  return tileProps
-
-}
-
-export function initialGameState() {
-  moveHistory = []
-  return getTileProps()
+function completeMove(pieceId) {
+  pieces[pieceId] = tileId
+  tileId = null
+  moveEndPoints = []
+  
 }
 
 
+function initialProps(includePieces = true, p = null) {
 
-function getCleanTileProps() {
   let foo = []
   tiles.map((t) => {
     let p = {
@@ -306,41 +286,78 @@ function getCleanTileProps() {
     foo.push(p)
   })
 
-  return addPiecesToProps(foo)
-}
-
-
-
-
-
-export function getTileProps() {
-
-  function setTileProps() {
-    if (tiles.length === 0) {
-      initiateBoard()
+  if (includePieces) {
+    if (p === null) {
+      p = pieces
     }
-
-    tiles.map((t) => {
-      let p = {
-        id : t.id,
-        center : 'inherit',
-        sides : [],
-        event : null,
-      }
-      t.next.map((n) => {
-        p.sides.push(n === null ? 'black' : 'inherit')
-      })
-      tileProps.push(p)
+    p.map((id) => {
+      foo[id].event = p.indexOf(id)
     })
-
-
   }
-  if (tileProps.length === 0) {
-    setTileProps()
-  }
-  console.log(tileProps);
-  return addPiecesToProps(tileProps)
+  return foo
 }
+
+
+
+
+
+
+
+export function handleDirectionEvent(index) {
+  console.log(moveEndPoints);
+  if (moveEndPoints.length === 0 || moveEndPoints[index] === null) {
+    return null
+  }
+  return handleTileClick(moveEndPoints[index])
+}
+
+
+
+
+
+export function handleTileClick(id) {
+  console.log(moveEndPoints);
+  if (pieces.includes(id)) {
+    return pieceIdSelected(pieces.indexOf(id))
+  }
+
+
+
+  if (moveEndPoints.includes(id) && tileId !== null) {
+
+    // PIECE STILL ACTIVE FOR NEXT MOVE
+    pieces[pieces.indexOf(tileId)] = id
+    return handleTileClick(id)
+
+
+    // NO PIECE ACTIVE FOR NEXT MOVE
+    /* 
+    pieces[pieces.indexOf(tileId)] = id
+    tileId = null
+    moveEndPoints = []
+    return initialProps()
+    */
+  }
+  return null
+}
+
+
+export function pieceIdSelected(pieceId) {
+  tileId = pieces[pieceId]
+  return getPieceMovementProps(pieceId)
+}
+
+export function initialGameState() {
+  if (tiles.length === 0) {
+    initiateBoard()
+  }
+
+  moveHistory = []
+  return initialProps()
+}
+
+
+
 
 
 export function getTileCorners() {
@@ -405,22 +422,6 @@ export function getTileCorners() {
 }
 
 
-function addPiecesToProps(props = null, p = null) {
-  if (props === null) {
-    props = getTileProps()
-  }
-  let data = props.slice()
-
-  if (p === null) {
-    p = pieces.slice()
-  }
-
-  p.map((id) => {
-    data[id].event = p.indexOf(id)
-  })
-
-  return data
-}
 
 function getPieceMovementProps(pieceId) {
 
@@ -428,7 +429,7 @@ function getPieceMovementProps(pieceId) {
   let moves = findPieceMoves(pieceId)
 
 
-  let props = getCleanTileProps()
+  let props = initialProps()
 
   props[id].center = getColorStrength(pieceId, 6)
   console.log(moves);
@@ -436,6 +437,7 @@ function getPieceMovementProps(pieceId) {
   for (let i = 0; i < 4; i++) {
     let p = moves[i]
     if (p.length ===  0) {
+      moveEndPoints.push(null)
       continue
     }
     moveEndPoints.push(p[p.length - 1])
@@ -463,7 +465,7 @@ export function pieceSelected(pieceId) {
   let moves = findPieceMoves(pieceId)
 
 
-  let props = getCleanTileProps()
+  let props = initialProps()
 
   props[id].center = lightColors[pieceId]
   console.log(moves);
@@ -488,12 +490,7 @@ export function pieceSelected(pieceId) {
 
 function findPieceMoves(pieceId, piecesLocation = pieces) {
   let id = piecesLocation[pieceId]
-  let t = tiles[id]
   let moves = getTileRoute(id).slice()
-  console.log(moves);
-  console.log(piecesLocation);
-
-
   for (let i = 0; i < piecesLocation.length; i++) {
     if (i === pieceId) {
       continue
@@ -523,7 +520,6 @@ function findPieceMoves(pieceId, piecesLocation = pieces) {
 
 
 function getTileRoute(id) {
-  console.log(id);
   
   let moves = []
   let t = tiles[id]

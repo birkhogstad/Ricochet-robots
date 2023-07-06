@@ -5,6 +5,7 @@ import Board from '../board/Board';
 import './Hub.style.css';
 import { robots } from '../../functions.utils';
 import Piece from '../util/Piece';
+import { handleDirectionEvent, initialGameState, pieceIdSelected } from '../board/functions.Board';
 
 
 export default function Hub({
@@ -14,8 +15,13 @@ export default function Hub({
 
   const hubRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: null, height: null });
-  
   const [moves, setMoves] = useState(null);
+  const [tileData, setTileData] = useState(null);
+
+
+  useEffect(() => {
+    setTileData(initialGameState())
+  }, []);
 
 /* 
 
@@ -57,15 +63,65 @@ export default function Hub({
 
   function pieceSelectorEvent(id) {
     console.log(id);
-
+    setTileData(pieceIdSelected(id))
   }
 
+  function directionMoveEvent(index) {
+    console.log(index);
+    let resp = handleDirectionEvent(index)
+    if (resp !== null) {
+      setTileData(resp)
+    }
+  }
+
+
+
+  function keyEvent(e) {
+    /* 
+    console.log(e.key);
+    console.log(e.keyCode);
+    */
+    console.log(e.key);
+    console.log(e.keyCode);
+
+    let value = 0
+
+    switch (e.keyCode) {
+      case 49:
+      case 50:
+      case 51:
+      case 52:
+        pieceSelectorEvent(e.keyCode - 49)
+        return;
+      case 65:
+        value++;
+      case 83:
+        value++;
+      case 68:
+        value++;
+      case 87:
+        directionMoveEvent(value)
+        return;
+
+    
+      default:
+        break;
+    }
+  }
+
+  if ([
+    tileData,
+  ].includes(null)) {
+    return <></>
+  }
 
   return (
     <div className='Hub' ref={hubRef}>
       <GameState click={stateEvent} moves={moves}/>
       <PieceSelector click={pieceSelectorEvent}/>
-      <Board dimensions={dimensions} />
+      <Board dimensions={dimensions} tileData={tileData}/>
+      <EventListener clicked={keyEvent} />
+
     </div>
   );
 }
@@ -149,6 +205,32 @@ function PieceSelector({
           )
         })
       }
+    </div>
+  )
+}
+
+
+
+function EventListener({
+  clicked,
+}) {
+
+
+
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      clicked(e)
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, []);
+
+  return (
+    <div>
+      
     </div>
   )
 }

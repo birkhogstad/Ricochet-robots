@@ -3,24 +3,23 @@ import { centerTileIds, colors, rowLength } from '../../functions.utils';
 
 
 import './Board.style.css';
-import { getTileCorners, getTileProps, pieceSelected } from './functions.Board';
+import { getTileCorners, getTileProps, handleTileClick, initialGameState, pieceSelected } from './functions.Board';
+import Piece from '../util/Piece';
 
 
 export default function Board({
+  dimensions,
+  tileData,
 
 }) {
+  const [s, setS] = useState(null)
 
   const [nestedIds, setNestedIds] = useState(null)
 
   const [tileCorners, setTileCorners] = useState(null)
-  const [tileData, setTileData] = useState(null)
+  const [data, setData] = useState(null)
   
   useEffect(() => {
-    getInitialBoard()
-  },[])
-
-
-  function getInitialBoard() {
     let ids = []
     let id = 0
     for (let i = 0; i < 16; i++) {
@@ -34,7 +33,26 @@ export default function Board({
     setNestedIds(ids)
 
     setTileCorners(getTileCorners())
-    setTileData(pieceSelected(1))
+  },[])
+
+  useEffect(() => {
+    setData(tileData)
+  },[tileData])
+
+  useEffect(() => {
+    let foo = Math.floor(Math.min(dimensions.width, Math.floor(dimensions.height * 0.8)) / rowLength)
+    setS(Math.max(foo, 50))
+    console.log(foo);
+  },[dimensions])
+
+
+  function clicked(id) {
+    console.log(id);
+
+    let resp = handleTileClick(id)
+    if (resp !== null) {
+      setData(resp)
+    }
 
   }
 
@@ -43,7 +61,7 @@ export default function Board({
   if (
     [
       tileCorners,
-      tileData,
+      data,
     ].includes(null)
   ) { return <></> }
 
@@ -57,8 +75,10 @@ export default function Board({
                 r.map((id) => {
                   return (
                     <Tile 
-                      data={tileData[id]}
+                      data={data[id]}
                       corners={tileCorners[id]}
+                      click={clicked}
+                      sideSize={s}
                     />
                   )
                 })
@@ -68,7 +88,6 @@ export default function Board({
           )
         })
       }
-
     </div>
   )
 }
@@ -76,12 +95,16 @@ export default function Board({
 
 function Tile({
   corners,
-  data
+  data,
+  click,
+  sideSize
 }) {
 
   const [d, setD] = useState(null)
   const [active, setActive] = useState(true)
   const [child, setChild] = useState(null)
+  const [dimentions, setDimentions] = useState(null)
+
   
   useEffect(() => {
     setD(data)
@@ -93,10 +116,15 @@ function Tile({
       setChild ((<span style={{margin : 'auto', fontSize : '10px'}}>{data.id}</span>))
     }
     if (data.event !== null) {
-      setChild ((<Piece color={colors[data.event]} />))
+      setChild ((<Piece id={data.event} />))
     }
 
   },[data])
+  
+  useEffect(() => {
+    setDimentions(sideSize + 'px')
+  },[sideSize])
+
 
 
   if (d === null) {
@@ -105,13 +133,11 @@ function Tile({
 
   if (!active) {
     return(
-      <div className='Tile' style={{backgroundColor : 'black'}}></div>
+      <div className='Tile' style={{backgroundColor : 'black', width : dimentions, height : dimentions}}></div>
     )
   }
-
-
   return(
-    <div className='Tile'>
+    <div className='Tile' style={{width : dimentions, height : dimentions}}>
       <div style={{display : 'flex', width : '100%', height : '10%'}}>
         <div className='TileCorner' style={{backgroundColor : corners[0]}}></div>
         <div style={{backgroundColor : d.sides[0], width : '80%', height : '100%'}}></div>
@@ -120,7 +146,14 @@ function Tile({
       <div style={{display : 'flex', width : '100%', height : '80%'}}>
         <div style={{backgroundColor : d.sides[3], width : '10%', height : '100%'}}></div>
         <div style={{backgroundColor : d.center, width : '80%', height : '100%', display : 'flex'}}>
-          {child}
+          <button 
+            className='TileButton'
+            type='button'
+            onClick={(e) => click(d.id)}
+          >
+            {child}
+
+          </button>
         </div>
         <div style={{backgroundColor : d.sides[1], width : '10%', height : '100%'}}></div>
       </div>
@@ -137,26 +170,6 @@ function Tile({
 }
 
 
-function Piece({
-  color = "red",
-}) {
-
-  const [c, setC] = useState(null)
-
-  useEffect(() => {
-    setC(color)
-  }, [])
-
-
-  return (
-    <svg width="40" height="40" className='Piece'>
-      <circle cx="20" cy="20" r="16" fill={'black'} />
-      <circle cx="20" cy="20" r="14" fill={c} />
-    </svg>
-  )
-  
-  
-}
 
 
 

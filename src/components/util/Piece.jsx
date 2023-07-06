@@ -1,20 +1,14 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { getPieceColor } from '../functions.utils';
+import { getPieceColor } from '../../functions.utils';
 
 function Piece({
   id,
   click = null,
-  multiplier = 1,
+  multiplier = 0.8,
 }) {
 
   const [m, setM] = useState(null)
   const [c, setC] = useState(null)
-
-
-
-
-
-
 
 
 

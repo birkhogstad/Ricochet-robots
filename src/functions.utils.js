@@ -8,6 +8,9 @@ export const colors = ['blue', 'red', 'green', 'yellow']
 export const lightColors = ['lightblue', 'lightcoral', 'lightgreen', 'lightyellow']
 
 
+export let robots = 4;
+
+
 const col = [
 
   [0, 0, 255],
@@ -25,6 +28,19 @@ export function getNextOffset() {
 export function getColorBase(index) {
   return col[index]
 }
+
+
+
+export function getColorStrength(index, str = 0, parts = 8) {
+  let arr = []
+  getColorBase(index).map((c) => {
+    arr.push(Math.min(255, Math.ceil(str * (255 / parts)) + c))
+  })
+  return getColorString(arr)
+
+  
+}
+
 
 export function getPieceColor(index) {
   return getColorString(getColorBase(index))

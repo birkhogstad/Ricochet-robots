@@ -4,12 +4,13 @@ import { centerTileIds, colors, rowLength } from '../../functions.utils';
 
 import './Board.style.css';
 import { getTileCorners, getTileProps, handleTileClick, initialGameState, pieceSelected } from './functions.Board';
-import Piece from '../Piece';
+import Piece from '../util/Piece';
 
 
 export default function Board({
-
+  dimensions
 }) {
+  const [s, setS] = useState(null)
 
   const [nestedIds, setNestedIds] = useState(null)
 
@@ -19,6 +20,12 @@ export default function Board({
   useEffect(() => {
     getInitialBoard()
   },[])
+
+  useEffect(() => {
+    let foo = Math.floor(Math.min(dimensions.width, Math.floor(dimensions.height * 0.8)) / rowLength)
+    setS(Math.max(foo, 50))
+    console.log(foo);
+  },[dimensions])
 
 
   function getInitialBoard() {
@@ -36,7 +43,6 @@ export default function Board({
 
     setTileCorners(getTileCorners())
     setTileData(initialGameState())
-
   }
 
   function clicked(id) {
@@ -71,6 +77,7 @@ export default function Board({
                       data={tileData[id]}
                       corners={tileCorners[id]}
                       click={clicked}
+                      sideSize={s}
                     />
                   )
                 })
@@ -89,11 +96,14 @@ function Tile({
   corners,
   data,
   click,
+  sideSize
 }) {
 
   const [d, setD] = useState(null)
   const [active, setActive] = useState(true)
   const [child, setChild] = useState(null)
+  const [dimentions, setDimentions] = useState(null)
+
   
   useEffect(() => {
     setD(data)
@@ -109,6 +119,11 @@ function Tile({
     }
 
   },[data])
+  
+  useEffect(() => {
+    setDimentions(sideSize + 'px')
+  },[sideSize])
+
 
 
   if (d === null) {
@@ -117,11 +132,11 @@ function Tile({
 
   if (!active) {
     return(
-      <div className='Tile' style={{backgroundColor : 'black'}}></div>
+      <div className='Tile' style={{backgroundColor : 'black', width : dimentions, height : dimentions}}></div>
     )
   }
   return(
-    <div className='Tile'>
+    <div className='Tile' style={{width : dimentions, height : dimentions}}>
       <div style={{display : 'flex', width : '100%', height : '10%'}}>
         <div className='TileCorner' style={{backgroundColor : corners[0]}}></div>
         <div style={{backgroundColor : d.sides[0], width : '80%', height : '100%'}}></div>

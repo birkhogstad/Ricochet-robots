@@ -1,4 +1,4 @@
-import { centerTileIds, colors, getNextOffset, lightColors, rowLength } from "../../functions.utils"
+import { centerTileIds, colors, getColorStrength, getNextOffset, lightColors, rowLength } from "../../functions.utils"
 
 
 
@@ -169,8 +169,13 @@ function initiateBoard() {
       [251, 252]
     ]
   
+    let id = 0
     g.map((e) => {
-      goals.push(e.id)
+      goals.push({
+        pieceId : id,
+        tileId : e.id,
+      })
+      id = (1 + id) % 4
       e.walls.map((i) => {
         wallBetween(e.id, tiles[e.id].next[i])
       })    
@@ -240,7 +245,7 @@ function initiateBoard() {
 
   initiateGoals()
 
-
+  console.log(goals);
   let invalidIds = goals.concat(centerIds)
 
 
@@ -263,6 +268,9 @@ export function handleTileClick(id) {
 
   if (pieces.includes(id)) {
     tileId = id
+
+    
+
     return getPieceMovementProps(pieces.indexOf(id))
   }
   if (moveEndPoints.includes(id) && tileId !== null) {
@@ -422,7 +430,7 @@ function getPieceMovementProps(pieceId) {
 
   let props = getCleanTileProps()
 
-  props[id].center = lightColors[pieceId]
+  props[id].center = getColorStrength(pieceId, 6)
   console.log(moves);
   moveEndPoints = []
   for (let i = 0; i < 4; i++) {
@@ -433,12 +441,12 @@ function getPieceMovementProps(pieceId) {
     moveEndPoints.push(p[p.length - 1])
     let tile = id
     for (let j = 0; j < p.length; j++) {
-      props[tile].sides[i] = lightColors[pieceId]
+      props[tile].sides[i] = getColorStrength(pieceId, 6)
       tile = p[j]
-      props[tile].sides[(i + 2) % 4] = lightColors[pieceId]
-      props[tile].center = lightColors[pieceId]
+      props[tile].sides[(i + 2) % 4] = getColorStrength(pieceId, 6)
+      props[tile].center = getColorStrength(pieceId, 6)
     }
-    props[tile].center = colors[pieceId]
+    props[tile].center = getColorStrength(pieceId, 3)
 
   }
   console.log(moveEndPoints);

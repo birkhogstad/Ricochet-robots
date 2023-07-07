@@ -10,7 +10,7 @@ import Piece from '../util/Piece';
 export default function Board({
   dimensions,
   tileData,
-
+  click
 }) {
   const [s, setS] = useState(null)
 
@@ -47,13 +47,7 @@ export default function Board({
 
 
   function clicked(id) {
-    console.log(id);
-
-    let resp = handleTileClick(id)
-    if (resp !== null) {
-      setData(resp)
-    }
-
+    click(id)
   }
 
 

@@ -11,6 +11,9 @@ export const lightColors = ['lightblue', 'lightcoral', 'lightgreen', 'lightyello
 export let robots = 4;
 
 
+export let live = false
+export let roundMoves = null
+
 const col = [
 
   [0, 0, 255],
@@ -28,6 +31,11 @@ export function getNextOffset() {
 export function getColorBase(index) {
   return col[index]
 }
+
+export function toggleLive() {
+  live = live === false
+}
+
 
 
 

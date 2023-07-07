@@ -3,9 +3,10 @@ import Board from '../board/Board';
 
 
 import './Hub.style.css';
-import { robots } from '../../functions.utils';
+import { live, robots, roundMoves, rowLength, toggleLive } from '../../functions.utils';
 import Piece from '../util/Piece';
-import { handleDirectionEvent, initialGameState, pieceIdSelected } from '../board/functions.Board';
+import { getCurrentMoves, handleDirectionEvent, handleTileClick, initialGameState, initialProps, pieceIdSelected, resetRound, startRound, undoMove } from '../board/functions.Board';
+import { initRoundState, roundState } from '../functions.Game';
 
 
 export default function Hub({
@@ -20,31 +21,8 @@ export default function Hub({
 
 
   useEffect(() => {
-    setTileData(initialGameState())
+    handleResponse(initialProps(false))
   }, []);
-
-/* 
-
-  const [m, setM] = useState(null)
-  const [c, setC] = useState(null)
-
-
-
-
-  useEffect(() => {
-    setC(getHubColor(id))
-  }, [id]);
-
-  useEffect(() => {
-    setM(multiplier)
-  }, [multiplier]);
-
-
-  if (c === null || m === null) {
-    return <></>
-  }
-
- */
 
   useEffect(() => {
     // Update the dimensions when the Hub component changes
@@ -55,23 +33,67 @@ export default function Hub({
   }, []);
 
 
+  function handleResponse(resp) {
+    console.log(resp);
+    if (resp === null) {
+      return
+    }
+    if (resp.length === rowLength * rowLength) {
+      setTileData(resp)
+    }
+
+    if (isLive()) {
+      if (getCurrentMoves() !== moves) {
+        setMoves(getCurrentMoves())
+      }
+    }
+
+  }
+
+
 
   function stateEvent(id) {
+    console.log(live);
     console.log(id);
+    switch (id) {
+      case 0:
+        handleResponse(startRound())
+        break;
+    
+      case 1:
+        handleResponse(resetRound())
+        break;
+    
+      case 2:
+        handleResponse(undoMove())
+        break;
+    
+      default:
+        break;
+    }
+  }
 
+  function tileClickEvent(id) {
+    if (isLive()) {
+      handleResponse(handleTileClick(id))
+    }
   }
 
   function pieceSelectorEvent(id) {
     console.log(id);
-    setTileData(pieceIdSelected(id))
+    if (isLive()) {
+      handleResponse(pieceIdSelected(id))
+    }
   }
 
   function directionMoveEvent(index) {
-    console.log(index);
-    let resp = handleDirectionEvent(index)
-    if (resp !== null) {
-      setTileData(resp)
+    if (isLive()) {
+      handleResponse(handleDirectionEvent(index))
     }
+  }
+
+  function isLive() {
+    return getCurrentMoves() !== null 
   }
 
 
@@ -84,8 +106,14 @@ export default function Hub({
     console.log(e.key);
     console.log(e.keyCode);
 
-    let value = 0
+    if (!isLive()) {
+      if (e.keyCode === 13 || e.keyCode === 32) {
+        stateEvent(0)
+      } 
+      return
+    }
 
+    let value = 0
     switch (e.keyCode) {
       case 49:
       case 50:
@@ -94,13 +122,23 @@ export default function Hub({
         pieceSelectorEvent(e.keyCode - 49)
         return;
       case 65:
+      case 37:
         value++;
       case 83:
+      case 40:
         value++;
       case 68:
+      case 39:
         value++;
       case 87:
+      case 38:
         directionMoveEvent(value)
+        return;
+      case 82:
+        stateEvent(1)
+        return;
+      case 8:
+        stateEvent(2)
         return;
 
     
@@ -114,12 +152,11 @@ export default function Hub({
   ].includes(null)) {
     return <></>
   }
-
   return (
     <div className='Hub' ref={hubRef}>
-      <GameState click={stateEvent} moves={moves}/>
+      <GameState click={stateEvent} moves={moves} />
       <PieceSelector click={pieceSelectorEvent}/>
-      <Board dimensions={dimensions} tileData={tileData}/>
+      <Board dimensions={dimensions} tileData={tileData} click={tileClickEvent}/>
       <EventListener clicked={keyEvent} />
 
     </div>
@@ -130,7 +167,7 @@ export default function Hub({
 function GameState({
   data = null,
   click,
-  moves
+  moves,
 }) {
 
   const [m, setM] = useState(null);
@@ -139,10 +176,29 @@ function GameState({
     setM(moves)
   }, [moves]);
 
+  function start() {
+    click(0)
+  }
+
   if (m === null) {
     return (
       <div className='GameState'>
-        hallo
+        
+        <button 
+          type='button'
+          onClick={(e) => start()}
+          style={{
+            backgroundColor : 'pink',
+            padding : '0',
+            border : '0',
+            margin : 'auto',
+            display : 'flex',
+          }}
+        >
+          <h2 style={{margin : '1rem', fontSize : '30px'}}>Start</h2>
+
+
+        </button>
       </div>
     )
   }
@@ -150,8 +206,63 @@ function GameState({
 
   return (
     <div className='GameState'>
-      hei
+              
+      <button 
+        type='button'
+        onClick={(e) => click(1)}
+        style={{
+          backgroundColor : 'pink',
+          padding : '0',
+          border : '0',
+          margin : 'auto',
+          display : 'flex',
+        }}
+      >
+        <h2 style={{margin : '1rem', fontSize : '30px'}}>Reset</h2>
 
+
+      </button>
+
+              
+      <button 
+        type='button'
+        onClick={(e) => click(0)}
+        style={{
+          backgroundColor : 'pink',
+          padding : '0',
+          border : '0',
+          margin : 'auto',
+          display : 'flex',
+        }}
+      >
+        <h2 style={{margin : '1rem', fontSize : '30px'}}>{m}</h2>
+
+
+      </button>
+
+              
+      <button 
+        type='button'
+        onClick={(e) => click(2)}
+        style={{
+          backgroundColor : 'pink',
+          padding : '0',
+          border : '0',
+          margin : 'auto',
+          display : 'flex',
+        }}
+      >
+        <h2 style={{margin : '1rem', fontSize : '30px'}}>Undo</h2>
+
+
+      </button>
+
+
+{/* 
+      <h2 style={{margin : 'auto', fontSize : '30px'}}>moves:</h2>
+      <h2 style={{margin : 'auto', fontSize : '30px'}}>{moves}</h2>
+
+ */}
 
     </div>
   )

@@ -180,7 +180,12 @@ function initiateBoard() {
         wallBetween(e.id, tiles[e.id].next[i])
       })    
     })
-  
+
+    for (let i = goals.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [goals[i], goals[j]] = [goals[j], goals[i]];
+    }
+
   
     walls.map((w) => {
       wallBetween(w[0], w[1])
@@ -267,9 +272,7 @@ export function startRound() {
   
   if (pieces.length === 0) {
 
-    let invalidIds = goals.concat(centerTileIds)
-  
-  
+    let invalidIds = centerTileIds.concat(goals.map((g) => g.tileId))  
     pieces = []
     while (pieces.length !== colors.length) {
       let id = Math.floor((Math.random()*tiles.length))

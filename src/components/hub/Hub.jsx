@@ -5,7 +5,7 @@ import Board from '../board/Board';
 import './Hub.style.css';
 import { live, robots, roundMoves, rowLength, toggleLive } from '../../functions.utils';
 import Piece from '../util/Piece';
-import { getCurrentMoves, handleDirectionEvent, handleTileClick, initialGameState, initialProps, pieceIdSelected, resetRound, startRound, undoMove } from '../board/functions.Board';
+import { gameIsLive, getMoveData, handleDirectionEvent, handleTileClick, initialGameState, initialProps, initiateRound, pieceIdSelected, resetRound, startRound, undoMove } from '../board/functions.Board';
 import { initRoundState, roundState } from '../functions.Game';
 
 
@@ -42,10 +42,10 @@ export default function Hub({
       setTileData(resp)
     }
 
-    if (isLive()) {
-      if (getCurrentMoves() !== moves) {
-        setMoves(getCurrentMoves())
-      }
+    if (gameIsLive()) {
+      setMoves(getMoveData())
+      
+      
     }
 
   }
@@ -53,11 +53,9 @@ export default function Hub({
 
 
   function stateEvent(id) {
-    console.log(live);
-    console.log(id);
     switch (id) {
       case 0:
-        handleResponse(startRound())
+        handleResponse(initiateRound())
         break;
     
       case 1:
@@ -74,27 +72,24 @@ export default function Hub({
   }
 
   function tileClickEvent(id) {
-    if (isLive()) {
+    if (gameIsLive()) {
       handleResponse(handleTileClick(id))
     }
   }
 
   function pieceSelectorEvent(id) {
     console.log(id);
-    if (isLive()) {
+    if (gameIsLive()) {
       handleResponse(pieceIdSelected(id))
     }
   }
 
   function directionMoveEvent(index) {
-    if (isLive()) {
+    if (gameIsLive()) {
       handleResponse(handleDirectionEvent(index))
     }
   }
 
-  function isLive() {
-    return getCurrentMoves() !== null 
-  }
 
 
 
@@ -106,7 +101,7 @@ export default function Hub({
     console.log(e.key);
     console.log(e.keyCode);
 
-    if (!isLive()) {
+    if (!gameIsLive()) {
       if (e.keyCode === 13 || e.keyCode === 32) {
         stateEvent(0)
       } 
@@ -176,6 +171,10 @@ function GameState({
     setM(moves)
   }, [moves]);
 
+  
+
+
+
   function start() {
     click(0)
   }
@@ -222,7 +221,7 @@ function GameState({
 
 
       </button>
-
+{/* 
               
       <button 
         type='button'
@@ -235,10 +234,13 @@ function GameState({
           display : 'flex',
         }}
       >
-        <h2 style={{margin : '1rem', fontSize : '30px'}}>{m}</h2>
+        <h2 style={{margin : '1rem', fontSize : '30px'}}>{m.count}</h2>
 
 
       </button>
+ */}
+
+      <MoveDisplay data={m}/>
 
               
       <button 
@@ -258,6 +260,7 @@ function GameState({
       </button>
 
 
+
 {/* 
       <h2 style={{margin : 'auto', fontSize : '30px'}}>moves:</h2>
       <h2 style={{margin : 'auto', fontSize : '30px'}}>{moves}</h2>
@@ -267,6 +270,94 @@ function GameState({
     </div>
   )
 }
+
+
+
+function MoveDisplay({
+  data,
+}) {
+
+
+
+  const [c, setC] = useState([]);
+  const [b, setB] = useState([]);
+
+  useEffect(() => {
+    if (data === null) {
+      return
+    }
+    setC(setDiv(data.count, 'moves'))
+    setB(setDiv(data.best, 'best'))
+  }, [data]);
+
+
+  function setDiv(value, str) {
+
+    if (value === null) {
+      return []
+    }
+
+    return ([
+      (    
+        <div className='MoveDataValue' style={{backgroundColor : 'orange', fontSize : '30px'}}>
+
+          <h2 style={{margin : 'auto', fontSize : '15px'}}>{str}</h2>
+        </div>
+      ),
+      
+      (
+        <div className='MoveDataValue' style={{backgroundColor : 'yellow', fontSize : '30px', height : '60%'}}>
+
+          <h2 style={{margin : 'auto', fontSize : '30px'}}>{value}</h2>
+        </div>
+      ),
+    ])
+  }
+
+
+
+
+
+  return (
+    <div className='MoveDisplay'>
+      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
+        {
+          c.map((e) => {return (e)})
+        }
+      </div>
+      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
+        {
+          b.map((e) => {return (e)})
+        }
+      </div>
+    </div>
+  )
+/* 
+
+  return (
+    <div className='MoveDisplay'>
+      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
+
+        <div className='MoveDataValue' style={{backgroundColor : 'orange', fontSize : '30px'}}>
+
+          <h2 style={{margin : 'auto', fontSize : '15px'}}>moves</h2>
+        </div>
+        <div className='MoveDataValue' style={{backgroundColor : 'yellow', fontSize : '30px', height : '60%'}}>
+
+          <h2 style={{margin : 'auto', fontSize : '30px'}}>{c}</h2>
+        </div>
+
+      </div>
+
+
+
+    </div>
+  )
+ */
+
+  
+}
+
 
 
 

@@ -39,19 +39,25 @@ export function toggleLive() {
 
 
 
-export function getColorStrength(index, str = 0, parts = 8) {
+export function getColorStrength(index, str = 0, parts = 10) {
   let arr = []
   getColorBase(index).map((c) => {
     arr.push(Math.min(255, Math.ceil(str * (255 / parts)) + c))
   })
-  return getColorString(arr)
+  return getColorString(arr)  
+}
 
-  
+export function getTargetPropSides(index) {
+  let arr = []
+  getColorBase(index).map((c) => {
+    arr.push(Math.max(20 , (c + 1) / 2))
+  })
+  return getColorString(arr)
 }
 
 
 export function getPieceColor(index) {
-  return getColorString(getColorBase(index))
+  return getColorStrength(index, 6)
 }
 
 

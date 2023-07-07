@@ -1,4 +1,5 @@
-import { centerTileIds, colors, getColorStrength, getNextOffset, lightColors, rowLength } from "../../functions.utils"
+import { centerTileIds, colors, getColorStrength, getNextOffset, lightColors, live, roundMoves, rowLength } from "../../functions.utils"
+import { initRoundState, setMoves } from "../functions.Game"
 
 
 
@@ -9,8 +10,7 @@ let goals = []
 let tileId = null
 let moveEndPoints = []
 
-let tileProps = []
-let moveHistory = []
+let moveHistory = null
 
 
 
@@ -245,20 +245,55 @@ function initiateBoard() {
 
   initiateGoals()
 
-  console.log(goals);
-  let invalidIds = goals.concat(centerIds)
+}
 
 
-  pieces = []
-  while (pieces.length !== colors.length) {
-    let id = Math.floor((Math.random()*tiles.length))
-    if (! invalidIds.includes(id)) {
-      invalidIds.push(id)
-      pieces.push(id)
-    }
-  }
+export function getCurrentMoves() {
+  return moveHistory === null ? null : moveHistory.length
+}
+
+export function resetRound() {
+  let foo = moveHistory.reverse()
+
+  foo.map((m) => {
+    pieces[m.pieceId] = m.from
+  })
+  return startRound()
+
+}
+
+export function startRound() {
+  moveHistory = []
   
-  findPieceMoves(1);
+  if (pieces.length === 0) {
+
+    let invalidIds = goals.concat(centerTileIds)
+  
+  
+    pieces = []
+    while (pieces.length !== colors.length) {
+      let id = Math.floor((Math.random()*tiles.length))
+      if (! invalidIds.includes(id)) {
+        invalidIds.push(id)
+        pieces.push(id)
+      }
+    }
+    
+  }
+  return initialProps()
+}
+
+export function undoMove() {
+
+  if ( moveHistory === null || moveHistory.length === 0) {
+    return null
+  }
+  console.log(moveHistory);
+  let m = moveHistory.pop()
+  console.log(moveHistory);
+  console.log(m);
+  pieces[m.pieceId] = m.from
+  return handleTileClick(m.from)
 
 }
 
@@ -294,8 +329,8 @@ export function initialProps(includePieces = true, p = null) {
 
 
 
+
 export function handleDirectionEvent(index) {
-  console.log(moveEndPoints);
   if (moveEndPoints.length === 0 || moveEndPoints[index] === null) {
     return null
   }
@@ -307,7 +342,6 @@ export function handleDirectionEvent(index) {
 
 
 export function handleTileClick(id) {
-  console.log(moveEndPoints);
   if (pieces.includes(id)) {
     return pieceIdSelected(pieces.indexOf(id))
   }
@@ -316,11 +350,15 @@ export function handleTileClick(id) {
 
   if (moveEndPoints.includes(id) && tileId !== null) {
 
+    moveHistory.push({
+      pieceId : pieces.indexOf(tileId),
+      from : tileId,
+      to : id,
+    })
+
     // PIECE STILL ACTIVE FOR NEXT MOVE
     pieces[pieces.indexOf(tileId)] = id
     return handleTileClick(id)
-
-
     // NO PIECE ACTIVE FOR NEXT MOVE
     /* 
     pieces[pieces.indexOf(tileId)] = id

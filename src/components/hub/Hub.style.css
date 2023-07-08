@@ -1,9 +1,25 @@
-.Hub {
-  background-color: yellow;
-  min-width: 100%;
+.Body {
+  background-color: green;
+  min-width: 80%;
   min-height: 100%;
   width: fit-content;
   height: fit-content;
+  
+}
+.StatesColumn {
+  background-color: burlywood;
+  width: 20%;
+  height: 400px;
+  margin: 0;
+
+}
+
+.Hub {
+  background-color: yellow;
+  width: 100%;
+  height: 100%;
+  display: flex;
+
   
 }
 

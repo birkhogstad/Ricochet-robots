@@ -1,0 +1,49 @@
+.Toolbar {
+  background-color: burlywood;
+  width: 200px;
+  height: 800px;
+}
+
+.Section {
+  background-color: greenyellow;
+  width: 100%;
+  height: fit-content;
+  margin: auto;
+}
+
+.MoveData {
+  background-color: greenyellow;
+  width: 100%;
+  height: fit-content;
+  margin: auto;
+  height: 20%;
+  display: flex;
+}
+
+.MoveDataDisplay {
+  width: 40%;
+  height: 100%;
+  margin: auto;
+}
+
+.MoveDataValue {
+  width: 100%;
+  height: 40%;
+  display: flex;
+  margin: auto;
+}
+
+
+
+
+.Button {
+  background-color: whitesmoke;
+  width: 80%;
+  height: 50px;
+  margin: auto;
+  margin-block: 10px;
+  display: flex;
+  padding: 0%;
+  border: 0;
+}
+

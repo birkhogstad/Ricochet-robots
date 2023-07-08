@@ -16,6 +16,7 @@ let target = null
 
 let gameState = {
   live : false,
+  round : false,
 }
 
 let moveData = {
@@ -24,11 +25,15 @@ let moveData = {
   history : [],
 }
 
-
+let endState = null
 
 
 export function gameIsLive() {
   return gameState.live
+}
+
+export function liveRound() {
+  return gameState.round
 }
 
 
@@ -49,22 +54,41 @@ export function resetRound() {
 
   moveData.history = []
   moveData.count = 0
+  gameState.live = true
+  console.log(pieces);
   return startRound()
 }
 
 export function initiateRound() {
   gameState.live = true
+
+  if (endState !== null) {
+    pieces = endState.slice()
+  }
+
   moveData = {
     best : null,
     count : 0,
     history : [],
   }
-  target = goals.pop()
+
+  // Infinite rounds
+
+  if (target === null || goals.indexOf(target) === 0) {
+    for (let i = goals.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [goals[i], goals[j]] = [goals[j], goals[i]];
+    }
+    console.log(goals);
+    target = goals[1]
+  } else {
+    target = goals[(goals.indexOf(target) + 1) % goals.length]
+  }
   return startRound()
 }
 
 export function startRound() {
-
+  gameState.round = true
   if (pieces.length === 0) {
     let invalidIds = centerTileIds.concat(goals.map((g) => g.tileId))  
     pieces = []
@@ -85,9 +109,11 @@ export function startRound() {
 export function undoMove() {
 
 
-  if ( moveData.count === null) {
+  if ( moveData.count === null || moveData.count === 0) {
     return null
   }
+
+  gameState.live = true
   moveData.count --
   let m = moveData.history.pop()
 
@@ -176,17 +202,20 @@ export function handleTileClick(id) {
     })
     moveData.count ++
 
+    pieces[pieceId] = id
 
     if (target !== null) {
       if (target.pieceId === pieceId && target.tileId === id) {
         if (moveData.best === null || moveData.count < moveData.best) {
           moveData.best = moveData.count
+          endState = pieces.slice()
         }
+        gameState.live = false
+        return initialProps()
       }
     }
 
     // PIECE STILL ACTIVE FOR NEXT MOVE
-    pieces[pieceId] = id
     return handleTileClick(id)
     // NO PIECE ACTIVE FOR NEXT MOVE
     /* 

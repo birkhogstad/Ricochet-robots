@@ -5,8 +5,9 @@ import Board from '../board/Board';
 import './Hub.style.css';
 import { live, robots, roundMoves, rowLength, toggleLive } from '../../functions.utils';
 import Piece from '../util/Piece';
-import { gameIsLive, getMoveData, handleDirectionEvent, handleTileClick, initialGameState, initialProps, initiateRound, pieceIdSelected, resetRound, startRound, undoMove } from '../board/functions.Board';
+import { gameIsLive, getMoveData, handleDirectionEvent, handleTileClick, initialGameState, initialProps, initiateRound, liveRound, pieceIdSelected, resetRound, startRound, undoMove } from '../board/functions.Board';
 import { initRoundState, roundState } from '../functions.Game';
+import Toolbar from '../toolbar/Toolbar';
 
 
 export default function Hub({
@@ -42,17 +43,15 @@ export default function Hub({
       setTileData(resp)
     }
 
-    if (gameIsLive()) {
-      setMoves(getMoveData())
-      
-      
-    }
+    setMoves(getMoveData())
+  
 
   }
 
 
 
   function stateEvent(id) {
+    console.log(id);
     switch (id) {
       case 0:
         handleResponse(initiateRound())
@@ -105,6 +104,9 @@ export default function Hub({
       if (e.keyCode === 13 || e.keyCode === 32) {
         stateEvent(0)
       } 
+      if (e.keyCode === 82 && liveRound()) {
+        stateEvent(1)
+      }
       return
     }
 
@@ -135,6 +137,12 @@ export default function Hub({
       case 8:
         stateEvent(2)
         return;
+      case 13:
+      case 32:
+        if (getMoveData().best !== null) {
+          stateEvent(0)
+        }
+        return;
 
     
       default:
@@ -149,11 +157,13 @@ export default function Hub({
   }
   return (
     <div className='Hub' ref={hubRef}>
-      <GameState click={stateEvent} moves={moves} />
-      <PieceSelector click={pieceSelectorEvent}/>
-      <Board dimensions={dimensions} tileData={tileData} click={tileClickEvent}/>
-      <EventListener clicked={keyEvent} />
-
+      <Toolbar click={stateEvent} moveData={moves}/>
+      <div className='Body'>
+        <GameState click={stateEvent} moves={moves} />
+        <PieceSelector click={pieceSelectorEvent}/>
+        <Board dimensions={dimensions} tileData={tileData} click={tileClickEvent}/>
+        <EventListener clicked={keyEvent} />
+      </div>
     </div>
   );
 }
@@ -270,6 +280,8 @@ function GameState({
     </div>
   )
 }
+
+
 
 
 

@@ -10,25 +10,21 @@
 }
 
 .TileButton {
-  background-color: inherit;
+  background-color: whitesmoke;
   padding: 0;
   border: 0;
-  margin: auto;
-  display: flex;
-}
-
-
-
-.Tile {
-  width: 50px;
-  height: 50px;
-  background-color: whitesmoke;
   margin: 0;
+
 }
+
+
+
+
 
 .TileCorner {
   width: 10%;
   height: 100%;
+  margin: 0;
 }
 
 
@@ -36,75 +32,4 @@
 
 
 
-
-
-.WallNorth {
-  width: 3.6rem;
-  height: 0.2rem;
-  background-color: darkgreen;
-  position: absolute;
-
-}
-.WallSouth {
-  width: 3.6rem;
-  height: 0.2rem;
-  background-color: darkgreen;
-  position: absolute;
-  margin-top: 3.4rem;
-  display: flex;
-}
-
-.WallWest {
-  height: 3.6rem;
-  width: 0.2rem;
-  background-color: darkgreen;
-  position: absolute;
-  display: flex;
-}
-
-.WallEast {
-  height: 3.6rem;
-  width: 0.2rem;
-  background-color: darkgreen;
-  position: absolute;
-  margin-left: 3.4rem;
-  display: flex;
-}
-
-
-.PathNorth {
-  width: 0.2rem;
-  height: 1.8rem;
-  position: absolute;
-  margin-left: 1.7rem;
-}
-
-.PathSouth {
-  width: 0.2rem;
-  height: 1.8rem;
-  position: absolute;
-  margin-top: 1.8rem;
-  margin-left: 1.7rem;
-}
-
-.PathEast {
-  width: 1.8rem;
-  height: 0.2rem;
-  position: absolute;
-  margin-top: 1.7rem;
-  margin-left: 1.8rem;
-}
-
-.PathWest {
-  width: 1.8rem;
-  height: 0.2rem;
-  position: absolute;
-  margin-top: 1.7rem;
-}
-
-
-.Piece {
-  display: flex;
-  margin: auto;
-}
 

@@ -5,8 +5,7 @@ import Board from '../board/Board';
 import './Hub.style.css';
 import { live, robots, roundMoves, rowLength, toggleLive } from '../../functions.utils';
 import Piece from '../util/Piece';
-import { gameIsLive, getMoveData, handleDirectionEvent, handleTileClick, initialGameState, initialProps, initiateRound, liveRound, pieceIdSelected, resetRound, startRound, undoMove } from '../board/functions.Board';
-import { initRoundState, roundState } from '../functions.Game';
+import { gameIsLive, getMoveData, handleDirectionEvent, handleTileClick, initialGameState, initialProps, initiateRound, liveRound, pieceIdSelected, resetRound, showBest, startRound, undoMove } from '../board/functions.Board';
 import Toolbar from '../toolbar/Toolbar';
 
 
@@ -20,9 +19,8 @@ export default function Hub({
   const [moves, setMoves] = useState(null);
   const [tileData, setTileData] = useState(null);
 
-
   useEffect(() => {
-    handleResponse(initialProps(false))
+    handleResponse(initialProps(false));
   }, []);
 
   useEffect(() => {
@@ -33,25 +31,43 @@ export default function Hub({
     }
   }, []);
 
-
   function handleResponse(resp) {
-    console.log(resp);
     if (resp === null) {
-      return
+      return;
     }
     if (resp.length === rowLength * rowLength) {
-      setTileData(resp)
+      setTileData(resp);
     }
 
-    setMoves(getMoveData())
-  
+    setMoves(getMoveData());
+  }
 
+  function showBestRoute() {
+    let p = showBest(null);
+
+    const delay = 500; 
+
+    const iterate = () => {
+      if (p !== null) {
+        setTileData(p);
+        setMoves(getMoveData())
+
+        setTimeout(() => {
+          p = showBest(p);
+          iterate();
+        }, delay);
+      }
+    };
+
+    iterate();
   }
 
 
 
+
+
+
   function stateEvent(id) {
-    console.log(id);
     switch (id) {
       case 0:
         handleResponse(initiateRound())
@@ -63,6 +79,13 @@ export default function Hub({
     
       case 2:
         handleResponse(undoMove())
+        break;
+
+      case 10:
+        if (getMoveData().best !== null) {
+          showBestRoute()
+        }
+
         break;
     
       default:
@@ -77,7 +100,6 @@ export default function Hub({
   }
 
   function pieceSelectorEvent(id) {
-    console.log(id);
     if (gameIsLive()) {
       handleResponse(pieceIdSelected(id))
     }
@@ -97,9 +119,6 @@ export default function Hub({
     console.log(e.key);
     console.log(e.keyCode);
     */
-    console.log(e.key);
-    console.log(e.keyCode);
-
     if (!gameIsLive()) {
       if (e.keyCode === 13 || e.keyCode === 32) {
         stateEvent(0)
@@ -156,11 +175,20 @@ export default function Hub({
     return <></>
   }
   return (
-    <div className='Hub' ref={hubRef}>
-      <Toolbar click={stateEvent} moveData={moves}/>
+    <div 
+      className='Hub' 
+      ref={hubRef}
+      style={{
+        backgroundColor: "burlywood",
+        position: "fixed",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      }}  
+    >
+      <Toolbar buttonClick={stateEvent} moveData={moves} pieceClick={pieceSelectorEvent} pieces={robots}/>
       <div className='Body'>
-        <GameState click={stateEvent} moves={moves} />
-        <PieceSelector click={pieceSelectorEvent}/>
         <Board dimensions={dimensions} tileData={tileData} click={tileClickEvent}/>
         <EventListener clicked={keyEvent} />
       </div>
@@ -169,259 +197,6 @@ export default function Hub({
 }
 
 
-function GameState({
-  data = null,
-  click,
-  moves,
-}) {
-
-  const [m, setM] = useState(null);
-
-  useEffect(() => {
-    setM(moves)
-  }, [moves]);
-
-  
-
-
-
-  function start() {
-    click(0)
-  }
-
-  if (m === null) {
-    return (
-      <div className='GameState'>
-        
-        <button 
-          type='button'
-          onClick={(e) => start()}
-          style={{
-            backgroundColor : 'pink',
-            padding : '0',
-            border : '0',
-            margin : 'auto',
-            display : 'flex',
-          }}
-        >
-          <h2 style={{margin : '1rem', fontSize : '30px'}}>Start</h2>
-
-
-        </button>
-      </div>
-    )
-  }
-
-
-  return (
-    <div className='GameState'>
-              
-      <button 
-        type='button'
-        onClick={(e) => click(1)}
-        style={{
-          backgroundColor : 'pink',
-          padding : '0',
-          border : '0',
-          margin : 'auto',
-          display : 'flex',
-        }}
-      >
-        <h2 style={{margin : '1rem', fontSize : '30px'}}>Reset</h2>
-
-
-      </button>
-{/* 
-              
-      <button 
-        type='button'
-        onClick={(e) => click(0)}
-        style={{
-          backgroundColor : 'pink',
-          padding : '0',
-          border : '0',
-          margin : 'auto',
-          display : 'flex',
-        }}
-      >
-        <h2 style={{margin : '1rem', fontSize : '30px'}}>{m.count}</h2>
-
-
-      </button>
- */}
-
-      <MoveDisplay data={m}/>
-
-              
-      <button 
-        type='button'
-        onClick={(e) => click(2)}
-        style={{
-          backgroundColor : 'pink',
-          padding : '0',
-          border : '0',
-          margin : 'auto',
-          display : 'flex',
-        }}
-      >
-        <h2 style={{margin : '1rem', fontSize : '30px'}}>Undo</h2>
-
-
-      </button>
-
-
-
-{/* 
-      <h2 style={{margin : 'auto', fontSize : '30px'}}>moves:</h2>
-      <h2 style={{margin : 'auto', fontSize : '30px'}}>{moves}</h2>
-
- */}
-
-    </div>
-  )
-}
-
-
-
-
-
-function MoveDisplay({
-  data,
-}) {
-
-
-
-  const [c, setC] = useState([]);
-  const [b, setB] = useState([]);
-
-  useEffect(() => {
-    if (data === null) {
-      return
-    }
-    setC(setDiv(data.count, 'moves'))
-    setB(setDiv(data.best, 'best'))
-  }, [data]);
-
-
-  function setDiv(value, str) {
-
-    if (value === null) {
-      return []
-    }
-
-    return ([
-      (    
-        <div className='MoveDataValue' style={{backgroundColor : 'orange', fontSize : '30px'}}>
-
-          <h2 style={{margin : 'auto', fontSize : '15px'}}>{str}</h2>
-        </div>
-      ),
-      
-      (
-        <div className='MoveDataValue' style={{backgroundColor : 'yellow', fontSize : '30px', height : '60%'}}>
-
-          <h2 style={{margin : 'auto', fontSize : '30px'}}>{value}</h2>
-        </div>
-      ),
-    ])
-  }
-
-
-
-
-
-  return (
-    <div className='MoveDisplay'>
-      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
-        {
-          c.map((e) => {return (e)})
-        }
-      </div>
-      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
-        {
-          b.map((e) => {return (e)})
-        }
-      </div>
-    </div>
-  )
-/* 
-
-  return (
-    <div className='MoveDisplay'>
-      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
-
-        <div className='MoveDataValue' style={{backgroundColor : 'orange', fontSize : '30px'}}>
-
-          <h2 style={{margin : 'auto', fontSize : '15px'}}>moves</h2>
-        </div>
-        <div className='MoveDataValue' style={{backgroundColor : 'yellow', fontSize : '30px', height : '60%'}}>
-
-          <h2 style={{margin : 'auto', fontSize : '30px'}}>{c}</h2>
-        </div>
-
-      </div>
-
-
-
-    </div>
-  )
- */
-
-  
-}
-
-
-
-
-function PieceSelector({
-  data = null,
-  click,
-  active,
-}) {
-
-  const [p, setP] = useState(null);
-
-  useEffect(() => {
-    let foo = []
-    for (let i = 0; i < robots; i++) {
-      foo.push({
-        id : i,
-        piece : <Piece id={i}  click={clicked} multiplier={1.5} />,
-      })
-    }
-    setP(foo)
-  }, []);
-
-  function clicked(id) {
-    click(id)
-  }
-
-  if (p === null) {
-    return (
-      <></>
-    )
-  }
-
-
-  return (
-    <div className='PieceSelector'>
-      {
-        p.map((e) => {
-          return (
-            <div className='PieceSelectorPiece'>
-              <div className='KeyString'>
-                <span style={{margin: 'auto'}}>
-                  {e.id + 1}
-                </span>
-              </div>
-              {e.piece}
-            </div>
-          )
-        })
-      }
-    </div>
-  )
-}
 
 
 
@@ -448,4 +223,6 @@ function EventListener({
     </div>
   )
 }
+
+
 

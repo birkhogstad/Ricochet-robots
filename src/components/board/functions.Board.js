@@ -1,5 +1,5 @@
+import { colorScaleValues, getColor } from "../../colors"
 import { centerTileIds, colors, getColorStrength, getNextOffset, getTargetPropSides, lightColors, live, roundMoves, rowLength } from "../../functions.utils"
-import { initRoundState, setMoves } from "../functions.Game"
 
 
 
@@ -23,6 +23,9 @@ let moveData = {
   best : null,
   count : null,
   history : [],
+  record : [],
+  show : [],
+  freeze : true
 }
 
 let endState = null
@@ -41,26 +44,89 @@ export function getMoveData() {
   return {
     count : moveData.count,
     best : moveData.best,
-
+    live : moveData.live,
+    freeze : moveData.freeze,
   }
 }
 
-export function resetRound() {
+function backTraceMoves() {
   let foo = moveData.history.reverse()
 
   foo.map((m) => {
     pieces[m.pieceId] = m.from
   })
-
   moveData.history = []
   moveData.count = 0
+}
+
+export function resetRound() {
+  backTraceMoves()
   gameState.live = true
-  console.log(pieces);
   return startRound()
+}
+
+export function showBest(props = null) {
+
+  if (props === null) {
+    gameState.live = false
+    backTraceMoves()
+    moveData.freeze = true
+  
+    let moves = []
+    let count = 0
+    moveData.record.map((m) => {
+      let c = {
+        id : moves.length,
+        tiles : getTileIdsPath(m.from, m.to),
+        dir : getNextIndex(m.from, m.to),
+        pieceId : m.pieceId,
+      }
+      count += c.tiles.length
+      moves.push(c)
+    })
+    colorScaleValues(count, moves)
+    moveData.show = moves.slice().reverse()
+  
+    props = initialProps()
+    moveData.history = moveData.record.slice()
+    return props
+  }
+
+  if (moveData.show.length === 0) {
+    moveData.show = null
+    moveData.freeze = false
+    return null
+  }
+
+
+  let m = moveData.show.pop()
+
+
+  props[pieces[m.pieceId]].event = null
+  pieces[m.pieceId] = m.tiles[m.tiles.length - 1]
+  props[pieces[m.pieceId]].event = m.pieceId
+
+
+
+
+  props[m.tiles[0]].center = m.colors[0]
+  for (let i = 1; i < m.tiles.length; i++) {
+    let t = m.tiles[i]
+    let c = m.colors[i]
+    props[t].center = c
+    props[t].sides[(6 + m.dir) % 4] = c
+    props[m.tiles[i - 1]].sides[m.dir] = m.colors[i - 1]
+  }
+  
+  moveData.count++
+  return props
+
+  
 }
 
 export function initiateRound() {
   gameState.live = true
+  moveData.freeze = false
 
   if (endState !== null) {
     pieces = endState.slice()
@@ -79,7 +145,7 @@ export function initiateRound() {
       const j = Math.floor(Math.random() * (i + 1));
       [goals[i], goals[j]] = [goals[j], goals[i]];
     }
-    console.log(goals);
+  
     target = goals[1]
   } else {
     target = goals[(goals.indexOf(target) + 1) % goals.length]
@@ -208,7 +274,15 @@ export function handleTileClick(id) {
       if (target.pieceId === pieceId && target.tileId === id) {
         if (moveData.best === null || moveData.count < moveData.best) {
           moveData.best = moveData.count
+          moveData.record = moveData.history.slice()
           endState = pieces.slice()
+        
+/* 
+
+
+return showBest()
+*/
+
         }
         gameState.live = false
         return initialProps()
@@ -338,7 +412,8 @@ export function pieceIdSelected(pieceId) {
   tileId = pieces[pieceId]
   let moves = findPieceMoves(pieceId)
   let props = initialProps(false)
-  props[tileId].center = getColorStrength(pieceId, 8)
+  let c = getColor(pieceId, 220)
+  props[tileId].center = c
   moveEndPoints = []
   for (let i = 0; i < 4; i++) {
     let p = moves[i]
@@ -349,15 +424,41 @@ export function pieceIdSelected(pieceId) {
     moveEndPoints.push(p[p.length - 1])
     let tile = tileId
     for (let j = 0; j < p.length; j++) {
-      props[tile].sides[i] = getColorStrength(pieceId, 8)
+      props[tile].sides[i] = c
       tile = p[j]
-      props[tile].sides[(i + 2) % 4] = getColorStrength(pieceId, 8)
-      props[tile].center = getColorStrength(pieceId, 8)
+      props[tile].sides[(i + 2) % 4] = c
+      props[tile].center = c
     }
-    props[tile].center = getColorStrength(pieceId, 6)
+    props[tile].center = getColor(pieceId, 180)
 
   }
   return finalizeProps(props)
+}
+
+
+
+function getNextIndex(a,b) {
+  let offset = (a % rowLength) === (b % rowLength) ? 2 : 1
+
+  return a < b ? offset : (offset + 2) % 4
+}
+
+
+function getTileIdOffset(a,b) {
+  let offset = (a % rowLength) === (b % rowLength) ? rowLength : 1
+  return offset * (b < a ? -1 : 1)
+}
+
+
+
+function getTileIdsPath(a, b) {
+  let offset = getTileIdOffset(a, b)
+  let arr = [a]
+  while (arr[arr.length - 1] !== b) {
+    arr.push(arr[arr.length - 1] + offset)
+  }
+  return arr
+
 }
 
 
@@ -599,4 +700,14 @@ function initiateBoard() {
 
   initiateGoals()
 
+}
+
+
+export function checkPiece(id) {
+
+
+  if (pieces.includes(id)) {
+    return pieces.indexOf(id)
+  }
+  return null
 }

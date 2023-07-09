@@ -1,50 +1,148 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 import './Toolbar.style.css';
+import Piece from '../util/Piece';
 
 
 export default function Toolbar({
   moveData,
-  click,
+  buttonClick,
+  pieceClick,
+  pieces
 }) {
 
 
 
   const [m, setM] = useState([]);
   const [b, setB] = useState((<Button value='Start' id={0} click={clicked}/>));
+  const [up, setUp] = useState([true, true, false, false, false, true]);
 
+
+  
   useEffect(() => {
     setM(moveData)
 
-    if (moveData.best === null && moveData.count !== null) {
-      setB(null)
+    let foo = up.slice()
+
+    
+    if (moveData.freeze) {
+      foo[3] = false
+      foo[2] = false 
+      foo[4] = false
     }
-    if (moveData.best !== null) {
-      setB((<Button value='Next' id={0} click={clicked}/>))
+    else {
+      if (moveData.count !== null && moveData.count !== 0) {
+        foo[3] = true
+        foo[2] = true
+      } else {
+        foo[3] = false
+        foo[2] = false 
+      }
+      if (moveData.best !== null) {
+        foo[4] = true
+        foo[5] = true
+      } else {
+        foo[4] = false
+        foo[5] = false
+        if (moveData.count === null) {
+          foo[5] = true
+  
+        }
+      }
+
     }
+
+
+    setUp(foo)
+
   }, [moveData]);
 
   function clicked(id) {
 
-    click(id)
+    buttonClick(id)
+  }
+
+  function pieceClicked(id) {
+    pieceClick(id)
   }
 
 
   
-  console.log(moveData);
 
   return (
     <div className='Toolbar'>
-      <div className='Section' style={{height : '50%', backgroundColor : 'blue'}}>
-      </div>
+        <Button value='Game mechanics' id={4} click={clicked}  active={up[0]}/>
+        <Button value='Controls' id={5} click={clicked} active={up[1]}/>
+        <Button value='Undo move' id={2} click={clicked} active={up[2]}/>
+        <Button value='Reset round' id={1} click={clicked} active={up[3]}/>
+        <Button value='See best' id={10} click={clicked} active={up[4]}/>
+        <Button value='New round' id={0} click={clicked} active={up[5]}/>
 
-      <div className='Section' style={{height : '10%', backgroundColor : 'white'}}>
-        {b}
-      </div>
 
       <MoveData data={m}/>
+
+      {
+        m.count === null ? <></> : 
+        <PieceSelector click={pieceClicked} pieces={pieces}/>
+      }
+      
     </div>
   )
+}
+
+
+function PieceSelector({
+  pieces = 4,
+  click,
+}) {
+
+  const [p, setP] = useState(null);
+
+
+  useEffect(() => {
+    let foo = []
+    for (let i = 0; i < pieces; i++) {
+      foo.push({
+        id : i,
+        piece : <Piece id={i}  click={clicked} multiplier={1.5} />,
+      })
+    }
+    setP(foo)
+  }, []);
+
+  function clicked(id) {
+    click(id)
+  }
+
+  if (p === null) {
+    return (
+      <></>
+    )
+  }
+
+
+  return (
+    <div className='PieceSelector'>
+      <div className='PieceSelectorPieces'>
+        {
+          p.map((e) => {
+            return (
+              <div className='PieceSelectorPiece'>
+                <div className='KeyString'>
+                  <span style={{margin: 'auto', fontSize : '30px'}}>
+                    {e.id + 1}
+                  </span>
+                </div>
+                {e.piece}
+              </div>
+            )
+          })
+        }
+      </div>
+    </div>
+  )
+
+
 }
 
 
@@ -84,14 +182,14 @@ function MoveData({
 
     return ([
       (    
-        <div className='MoveDataValue' style={{backgroundColor : 'orange', fontSize : '30px'}}>
+        <div className='MoveDataValue' style={{fontSize : '30px'}}>
 
           <h2 style={{margin : 'auto', fontSize : '30px'}}>{str}</h2>
         </div>
       ),
       
       (
-        <div className='MoveDataValue' style={{backgroundColor : 'yellow', fontSize : '30px', height : '60%'}}>
+        <div className='MoveDataValue' style={{fontSize : '30px', height : '60%'}}>
 
           <h2 style={{margin : 'auto', fontSize : '50px', color : c}}>{value}</h2>
         </div>
@@ -105,12 +203,12 @@ function MoveData({
 
   return (
     <div className='MoveData'>
-      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
+      <div className='MoveDataDisplay' style={{fontSize : '30px'}}>
         {
           c.map((e) => {return (e)})
         }
       </div>
-      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
+      <div className='MoveDataDisplay' style={{fontSize : '30px'}}>
         {
           b.map((e) => {return (e)})
         }
@@ -119,26 +217,37 @@ function MoveData({
   )
 }
 
-
 function Button({
   value = 'test',
   id,
   click,
+  active = false
 }) {
   return (
 
-              
-      <button 
-        className='Button'
-        type='button'
-        onClick={(e) => {click(id)}}
+    <div className='ButtonContainer'>
+      {
+        !active ? <></> :
+        <button 
+          className='Button'
+          type='button'
+          onClick={(e) => {click(id)}}
+          
+          >
+          <h2 style={{margin : 'auto', fontSize : '20px'}}>{value}</h2>
 
-      >
-        <h2 style={{margin : 'auto', fontSize : '25px'}}>{value}</h2>
 
+        </button>
 
-      </button>
+      }
+            
+    </div>
 
   )
 }
+
+
+
+
+
 

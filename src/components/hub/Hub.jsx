@@ -3,9 +3,9 @@ import Board from '../board/Board';
 
 
 import './Hub.style.css';
-import { live, robots, roundMoves, rowLength, toggleLive } from '../../functions.utils';
+import { rowLength } from '../../functions.utils';
 import Piece from '../util/Piece';
-import { gameIsLive, getMoveData, handleDirectionEvent, handleTileClick, initialGameState, initialProps, initiateRound, liveRound, pieceIdSelected, resetRound, showBest, startRound, undoMove } from '../board/functions.Board';
+import { boardEvent, gameIsLive, getMoveData, initialProps, liveRound, pieceIdSelected, setInitialState, showBest, undoMove } from '../board/functions.Board';
 import Toolbar from '../toolbar/Toolbar';
 
 
@@ -64,20 +64,13 @@ export default function Hub({
   }
 
 
-
-
-
-
   function stateEvent(id) {
     switch (id) {
       case 0:
-        handleResponse(initiateRound())
-        break;
-    
       case 1:
-        handleResponse(resetRound())
+        handleResponse(setInitialState(id))
         break;
-    
+
       case 2:
         handleResponse(undoMove())
         break;
@@ -86,9 +79,8 @@ export default function Hub({
         if (getMoveData().best !== null) {
           showBestRoute()
         }
-
         break;
-    
+  
       default:
         break;
     }
@@ -96,7 +88,7 @@ export default function Hub({
 
   function tileClickEvent(id) {
     if (gameIsLive()) {
-      handleResponse(handleTileClick(id))
+      handleResponse(boardEvent(id))
     }
   }
 
@@ -108,7 +100,7 @@ export default function Hub({
 
   function directionMoveEvent(index) {
     if (gameIsLive()) {
-      handleResponse(handleDirectionEvent(index))
+      handleResponse(boardEvent(index, 1))
     }
   }
 

@@ -59,12 +59,6 @@ function backTraceMoves() {
   moveData.count = 0
 }
 
-export function resetRound() {
-  backTraceMoves()
-  gameState.live = true
-  return startRound()
-}
-
 export function showBest(props = null) {
 
   if (props === null) {
@@ -124,36 +118,40 @@ export function showBest(props = null) {
   
 }
 
-export function initiateRound() {
-  gameState.live = true
-  moveData.freeze = false
 
-  if (endState !== null) {
-    pieces = endState.slice()
+export function setInitialState(id) {
+
+  if (id === 1) { // RESET ROUND
+    backTraceMoves()
+    gameState.live = true
   }
-
-  moveData = {
-    best : null,
-    count : 0,
-    history : [],
-  }
-
-  // Infinite rounds
-
-  if (target === null || goals.indexOf(target) === 0) {
-    for (let i = goals.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [goals[i], goals[j]] = [goals[j], goals[i]];
+  else if (id === 0) { // INIT NEW ROUND
+    gameState.live = true
+    moveData.freeze = false
+  
+    if (endState !== null) {
+      pieces = endState.slice()
     }
   
-    target = goals[1]
-  } else {
-    target = goals[(goals.indexOf(target) + 1) % goals.length]
+    moveData = {
+      best : null,
+      count : 0,
+      history : [],
+    }
+  
+    // Infinite rounds
+  
+    if (target === null || goals.indexOf(target) === 0) {
+      for (let i = goals.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [goals[i], goals[j]] = [goals[j], goals[i]];
+      }
+    
+      target = goals[1]
+    } else {
+      target = goals[(goals.indexOf(target) + 1) % goals.length]
+    }
   }
-  return startRound()
-}
-
-export function startRound() {
   gameState.round = true
   if (pieces.length === 0) {
     let invalidIds = centerTileIds.concat(goals.map((g) => g.tileId))  
@@ -167,9 +165,8 @@ export function startRound() {
     }
     
   }
-
-
   return initialProps()
+
 }
 
 export function undoMove() {
@@ -184,11 +181,11 @@ export function undoMove() {
   let m = moveData.history.pop()
 
   pieces[m.pieceId] = m.from
-  return handleTileClick(m.from)
+  return boardEvent(m.from)
 
 }
 
-export function initialProps(includePieces = true, p = null) {
+export function initialProps(includePieces = true, r = null) {
   if (tiles.length === 0) {
     initiateBoard()
   }
@@ -205,61 +202,33 @@ export function initialProps(includePieces = true, p = null) {
     })
     foo.push(p)
   })
-
   if (includePieces) {
-    return finalizeProps(foo)
-  }
-
-  return foo
-
-}
-
-function finalizeProps(props, includePieces = true, p = null) {
-  if (includePieces) {
-    if (p === null) {
-      p = pieces
+    if (r === null) {
+      r = pieces
     }
-    p.map((id) => {
-      props[id].event = p.indexOf(id)
+    r.map((id) => {
+      foo[id].event = r.indexOf(id)
     })
-  }
 
-  if (target !== null) {
-    props[target.tileId].center = getColorStrength(target.pieceId, 4)
-    let foo = [0, 1, 2, 3]
-    foo.map((f) => {
-      foo[f] = props[target.tileId].sides[f] === 'black' ? 'black' : getTargetPropSides(target.pieceId)
-    })
-    props[target.tileId].sides = foo
+    addTargetProp(foo)
   }
-  return props
+  return foo
 }
 
 
 
-
-
-
-export function handleDirectionEvent(index) {
-  if (moveEndPoints.length === 0 || moveEndPoints[index] === null) {
-    return null
+export function boardEvent(id, key = 0) {
+  if (key === 1) {
+    if (moveEndPoints.length === 0 || moveEndPoints[id] === null) {
+      return null
+    }
+    id = moveEndPoints[id]
   }
-  return handleTileClick(moveEndPoints[index])
-}
 
-
-
-
-
-export function handleTileClick(id) {
   if (pieces.includes(id)) {
     return pieceIdSelected(pieces.indexOf(id))
   }
-
-
-
   if (moveEndPoints.includes(id) && tileId !== null) {
-
     let pieceId = pieces.indexOf(tileId)
     moveData.history.push({
       pieceId : pieceId,
@@ -267,22 +236,13 @@ export function handleTileClick(id) {
       to : id,
     })
     moveData.count ++
-
     pieces[pieceId] = id
-
     if (target !== null) {
       if (target.pieceId === pieceId && target.tileId === id) {
         if (moveData.best === null || moveData.count < moveData.best) {
           moveData.best = moveData.count
           moveData.record = moveData.history.slice()
           endState = pieces.slice()
-        
-/* 
-
-
-return showBest()
-*/
-
         }
         gameState.live = false
         return initialProps()
@@ -290,7 +250,7 @@ return showBest()
     }
 
     // PIECE STILL ACTIVE FOR NEXT MOVE
-    return handleTileClick(id)
+    return boardEvent(id)
     // NO PIECE ACTIVE FOR NEXT MOVE
     /* 
     pieces[pieces.indexOf(tileId)] = id
@@ -300,7 +260,10 @@ return showBest()
     */
   }
   return null
+
 }
+
+
 
 
 
@@ -411,7 +374,7 @@ function getTileRoute(id) {
 export function pieceIdSelected(pieceId) {
   tileId = pieces[pieceId]
   let moves = findPieceMoves(pieceId)
-  let props = initialProps(false)
+  let props = initialProps()
   let c = getColor(pieceId, 220)
   props[tileId].center = c
   moveEndPoints = []
@@ -432,9 +395,21 @@ export function pieceIdSelected(pieceId) {
     props[tile].center = getColor(pieceId, 180)
 
   }
-  return finalizeProps(props)
+  addTargetProp(props)
+  return props
 }
 
+
+function addTargetProp(props) {
+  if (target !== null) {
+    props[target.tileId].center = getColorStrength(target.pieceId, 4)
+    let foo = [0, 1, 2, 3]
+    foo.map((f) => {
+      foo[f] = props[target.tileId].sides[f] === 'black' ? 'black' : getTargetPropSides(target.pieceId)
+    })
+    props[target.tileId].sides = foo
+  }
+}
 
 
 function getNextIndex(a,b) {
@@ -702,12 +677,3 @@ function initiateBoard() {
 
 }
 
-
-export function checkPiece(id) {
-
-
-  if (pieces.includes(id)) {
-    return pieces.indexOf(id)
-  }
-  return null
-}

@@ -13,6 +13,12 @@ export default function Toolbar({
   const [m, setM] = useState([]);
   const [b, setB] = useState((<Button value='Start' id={0} click={clicked}/>));
 
+
+  const reset = [
+    <Button value='Undo move' id={2} click={clicked}/>,
+    <Button value='Reset round' id={1} click={clicked}/>
+  ]
+
   useEffect(() => {
     setM(moveData)
 
@@ -35,10 +41,19 @@ export default function Toolbar({
 
   return (
     <div className='Toolbar'>
-      <div className='Section' style={{height : '50%', backgroundColor : 'blue'}}>
+      <div className='Section' style={{height : '20%'}}>
+        <Button value='Game mechanics' id={4} click={clicked}/>
+        <Button value='Controls' id={5} click={clicked}/>
+      </div>
+      <div className='Section' style={{height : '20%'}}>
+        {
+          m.count === null || m.count === 0 ? <></> : 
+          reset.map((b) => {return (b)})
+        }
+        
       </div>
 
-      <div className='Section' style={{height : '10%', backgroundColor : 'white'}}>
+      <div className='Section' style={{height : '10%'}}>
         {b}
       </div>
 
@@ -84,14 +99,14 @@ function MoveData({
 
     return ([
       (    
-        <div className='MoveDataValue' style={{backgroundColor : 'orange', fontSize : '30px'}}>
+        <div className='MoveDataValue' style={{fontSize : '30px'}}>
 
           <h2 style={{margin : 'auto', fontSize : '30px'}}>{str}</h2>
         </div>
       ),
       
       (
-        <div className='MoveDataValue' style={{backgroundColor : 'yellow', fontSize : '30px', height : '60%'}}>
+        <div className='MoveDataValue' style={{fontSize : '30px', height : '60%'}}>
 
           <h2 style={{margin : 'auto', fontSize : '50px', color : c}}>{value}</h2>
         </div>
@@ -105,12 +120,12 @@ function MoveData({
 
   return (
     <div className='MoveData'>
-      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
+      <div className='MoveDataDisplay' style={{fontSize : '30px'}}>
         {
           c.map((e) => {return (e)})
         }
       </div>
-      <div className='MoveDataDisplay' style={{backgroundColor : 'pink', fontSize : '30px'}}>
+      <div className='MoveDataDisplay' style={{fontSize : '30px'}}>
         {
           b.map((e) => {return (e)})
         }
@@ -127,17 +142,20 @@ function Button({
 }) {
   return (
 
-              
+    <div className='ButtonContainer'>
+
+            
       <button 
         className='Button'
         type='button'
         onClick={(e) => {click(id)}}
-
-      >
-        <h2 style={{margin : 'auto', fontSize : '25px'}}>{value}</h2>
+        
+        >
+        <h2 style={{margin : 'auto', fontSize : '20px'}}>{value}</h2>
 
 
       </button>
+    </div>
 
   )
 }

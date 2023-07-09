@@ -50,10 +50,11 @@ export default function Hub({
     const iterate = () => {
       if (p !== null) {
         setTileData(p);
-        setMoves(getMoveData())
+
 
         setTimeout(() => {
           p = showBest(p);
+          setMoves(getMoveData())
           iterate();
         }, delay);
       }

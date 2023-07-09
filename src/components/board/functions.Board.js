@@ -44,7 +44,7 @@ export function getMoveData() {
   return {
     count : moveData.count,
     best : moveData.best,
-    live : moveData.live,
+    live : gameState.live,
     freeze : moveData.freeze,
   }
 }

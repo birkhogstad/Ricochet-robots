@@ -33,7 +33,9 @@ export default function Toolbar({
     else {
       if (moveData.count !== null && moveData.count !== 0) {
         foo[3] = true
-        foo[2] = true
+        if (moveData.live) {
+          foo[2] = true
+        }
       } else {
         foo[3] = false
         foo[2] = false 

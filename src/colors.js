@@ -78,7 +78,7 @@ export function colorScaleValues(count, paths) {
     high : 255,
   }
   let i = {
-    low : -3,
+    low : -2,
     high : 0,
   }
   paths.map((p) => {
@@ -93,7 +93,7 @@ export function colorScaleValues(count, paths) {
       if (c.low < 100) {
         c.low = 100
         i.low = 0
-        i.high = -2
+        i.high = -1
       }
       if (c.high < 100) {
         c.high = 100

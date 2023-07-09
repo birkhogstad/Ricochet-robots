@@ -156,10 +156,20 @@ export default function Hub({
     return <></>
   }
   return (
-    <div className='Hub' ref={hubRef}>
-      <Toolbar click={stateEvent} moveData={moves}/>
+    <div 
+      className='Hub' 
+      ref={hubRef}
+      style={{
+        backgroundColor: "burlywood",
+        position: "fixed",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      }}  
+    >
+      <Toolbar buttonClick={stateEvent} moveData={moves} pieceClick={pieceSelectorEvent} pieces={robots}/>
       <div className='Body'>
-        <PieceSelector click={pieceSelectorEvent}/>
         <Board dimensions={dimensions} tileData={tileData} click={tileClickEvent}/>
         <EventListener clicked={keyEvent} />
       </div>
@@ -168,57 +178,6 @@ export default function Hub({
 }
 
 
-
-
-function PieceSelector({
-  data = null,
-  click,
-  active,
-}) {
-
-  const [p, setP] = useState(null);
-
-  useEffect(() => {
-    let foo = []
-    for (let i = 0; i < robots; i++) {
-      foo.push({
-        id : i,
-        piece : <Piece id={i}  click={clicked} multiplier={1.5} />,
-      })
-    }
-    setP(foo)
-  }, []);
-
-  function clicked(id) {
-    click(id)
-  }
-
-  if (p === null) {
-    return (
-      <></>
-    )
-  }
-
-
-  return (
-    <div className='PieceSelector'>
-      {
-        p.map((e) => {
-          return (
-            <div className='PieceSelectorPiece'>
-              <div className='KeyString'>
-                <span style={{margin: 'auto'}}>
-                  {e.id + 1}
-                </span>
-              </div>
-              {e.piece}
-            </div>
-          )
-        })
-      }
-    </div>
-  )
-}
 
 
 

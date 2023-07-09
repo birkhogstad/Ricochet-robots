@@ -1,6 +1,6 @@
 .Toolbar {
   width: 200px;
-  height: 800px;
+  height: 100%;
 }
 
 .Section {
@@ -11,10 +11,10 @@
 
 .MoveData {
   width: 100%;
-  height: fit-content;
   margin: auto;
-  height: 20%;
+  height: 10%;
   display: flex;
+  background-color: pink;
 }
 
 .MoveDataDisplay {
@@ -48,5 +48,30 @@
   display: flex;
   padding: 0%;
   border: 0;
+}
+
+
+.PieceSelector {
+  margin: auto;
+  height: 40%;
+  display: flex;
+}
+
+.PieceSelectorPieces {
+  margin: auto;
+  min-height: 60%;
+  min-width: 40%;
+  height: fit-content;
+}
+
+.PieceSelectorPiece {
+  margin: auto;
+  display: flex;
+}
+
+.KeyString {
+  margin: auto;
+  display: flex;
+  font-size: 20px;
 }
 

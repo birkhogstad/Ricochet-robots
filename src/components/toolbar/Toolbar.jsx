@@ -1,11 +1,14 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 import './Toolbar.style.css';
+import Piece from '../util/Piece';
 
 
 export default function Toolbar({
   moveData,
-  click,
+  buttonClick,
+  pieceClick,
+  pieces
 }) {
 
 
@@ -32,7 +35,11 @@ export default function Toolbar({
 
   function clicked(id) {
 
-    click(id)
+    buttonClick(id)
+  }
+
+  function pieceClicked(id) {
+    pieceClick(id)
   }
 
 
@@ -48,18 +55,77 @@ export default function Toolbar({
       <div className='Section' style={{height : '20%'}}>
         {
           m.count === null || m.count === 0 ? <></> : 
-          reset.map((b) => {return (b)})
+          reset.map((e) => {return (e)})
         }
-        
       </div>
 
       <div className='Section' style={{height : '10%'}}>
         {b}
       </div>
-
       <MoveData data={m}/>
+
+      {
+        m.count === null ? <></> : 
+        <PieceSelector click={pieceClicked} pieces={pieces}/>
+      }
+      
     </div>
   )
+}
+
+
+function PieceSelector({
+  pieces = 4,
+  click,
+}) {
+
+  const [p, setP] = useState(null);
+
+
+  useEffect(() => {
+    let foo = []
+    for (let i = 0; i < pieces; i++) {
+      foo.push({
+        id : i,
+        piece : <Piece id={i}  click={clicked} multiplier={1.5} />,
+      })
+    }
+    setP(foo)
+  }, []);
+
+  function clicked(id) {
+    click(id)
+  }
+
+  if (p === null) {
+    return (
+      <></>
+    )
+  }
+
+
+  return (
+    <div className='PieceSelector'>
+      <div className='PieceSelectorPieces'>
+        {
+          p.map((e) => {
+            return (
+              <div className='PieceSelectorPiece'>
+                <div className='KeyString'>
+                  <span style={{margin: 'auto', fontSize : '30px'}}>
+                    {e.id + 1}
+                  </span>
+                </div>
+                {e.piece}
+              </div>
+            )
+          })
+        }
+      </div>
+    </div>
+  )
+
+
 }
 
 
@@ -134,7 +200,6 @@ function MoveData({
   )
 }
 
-
 function Button({
   value = 'test',
   id,
@@ -159,4 +224,9 @@ function Button({
 
   )
 }
+
+
+
+
+
 

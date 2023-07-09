@@ -15,22 +15,46 @@ export default function Toolbar({
 
   const [m, setM] = useState([]);
   const [b, setB] = useState((<Button value='Start' id={0} click={clicked}/>));
+  const [up, setUp] = useState([true, true, false, false, false, true]);
 
 
-  const reset = [
-    <Button value='Undo move' id={2} click={clicked}/>,
-    <Button value='Reset round' id={1} click={clicked}/>
-  ]
-
+  
   useEffect(() => {
     setM(moveData)
 
-    if (moveData.best === null && moveData.count !== null) {
-      setB(null)
+    let foo = up.slice()
+
+    
+    if (moveData.freeze) {
+      foo[3] = false
+      foo[2] = false 
+      foo[4] = false
     }
-    if (moveData.best !== null) {
-      setB((<Button value='Next' id={0} click={clicked}/>))
+    else {
+      if (moveData.count !== null && moveData.count !== 0) {
+        foo[3] = true
+        foo[2] = true
+      } else {
+        foo[3] = false
+        foo[2] = false 
+      }
+      if (moveData.best !== null) {
+        foo[4] = true
+        foo[5] = true
+      } else {
+        foo[4] = false
+        foo[5] = false
+        if (moveData.count === null) {
+          foo[5] = true
+  
+        }
+      }
+
     }
+
+
+    setUp(foo)
+
   }, [moveData]);
 
   function clicked(id) {
@@ -47,21 +71,14 @@ export default function Toolbar({
 
   return (
     <div className='Toolbar'>
-      <div className='Section' style={{height : '20%'}}>
-        <Button value='Game mechanics' id={4} click={clicked}/>
-        <Button value='Controls' id={5} click={clicked}/>
-        <Button value='Show solution' id={10} click={clicked}/>
-      </div>
-      <div className='Section' style={{height : '20%'}}>
-        {
-          m.count === null || m.count === 0 ? <></> : 
-          reset.map((e) => {return (e)})
-        }
-      </div>
+        <Button value='Game mechanics' id={4} click={clicked}  active={up[0]}/>
+        <Button value='Controls' id={5} click={clicked} active={up[1]}/>
+        <Button value='Undo move' id={2} click={clicked} active={up[2]}/>
+        <Button value='Reset round' id={1} click={clicked} active={up[3]}/>
+        <Button value='See best' id={10} click={clicked} active={up[4]}/>
+        <Button value='New round' id={0} click={clicked} active={up[5]}/>
 
-      <div className='Section' style={{height : '10%'}}>
-        {b}
-      </div>
+
       <MoveData data={m}/>
 
       {
@@ -204,22 +221,26 @@ function Button({
   value = 'test',
   id,
   click,
+  active = false
 }) {
   return (
 
     <div className='ButtonContainer'>
+      {
+        !active ? <></> :
+        <button 
+          className='Button'
+          type='button'
+          onClick={(e) => {click(id)}}
+          
+          >
+          <h2 style={{margin : 'auto', fontSize : '20px'}}>{value}</h2>
 
+
+        </button>
+
+      }
             
-      <button 
-        className='Button'
-        type='button'
-        onClick={(e) => {click(id)}}
-        
-        >
-        <h2 style={{margin : 'auto', fontSize : '20px'}}>{value}</h2>
-
-
-      </button>
     </div>
 
   )

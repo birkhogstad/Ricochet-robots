@@ -6,7 +6,6 @@ import './Hub.style.css';
 import { live, robots, roundMoves, rowLength, toggleLive } from '../../functions.utils';
 import Piece from '../util/Piece';
 import { gameIsLive, getMoveData, handleDirectionEvent, handleTileClick, initialGameState, initialProps, initiateRound, liveRound, pieceIdSelected, resetRound, showBest, startRound, undoMove } from '../board/functions.Board';
-import { initRoundState, roundState } from '../functions.Game';
 import Toolbar from '../toolbar/Toolbar';
 
 
@@ -101,7 +100,6 @@ export default function Hub({
   }
 
   function pieceSelectorEvent(id) {
-    console.log(id);
     if (gameIsLive()) {
       handleResponse(pieceIdSelected(id))
     }
@@ -121,9 +119,6 @@ export default function Hub({
     console.log(e.key);
     console.log(e.keyCode);
     */
-    console.log(e.key);
-    console.log(e.keyCode);
-
     if (!gameIsLive()) {
       if (e.keyCode === 13 || e.keyCode === 32) {
         stateEvent(0)

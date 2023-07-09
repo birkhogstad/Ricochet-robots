@@ -1,6 +1,5 @@
 import { colorScaleValues, getColor } from "../../colors"
 import { centerTileIds, colors, getColorStrength, getNextOffset, getTargetPropSides, lightColors, live, roundMoves, rowLength } from "../../functions.utils"
-import { initRoundState, setMoves } from "../functions.Game"
 
 
 
@@ -25,7 +24,8 @@ let moveData = {
   count : null,
   history : [],
   record : [],
-  show : []
+  show : [],
+  freeze : true
 }
 
 let endState = null
@@ -44,7 +44,8 @@ export function getMoveData() {
   return {
     count : moveData.count,
     best : moveData.best,
-
+    live : moveData.live,
+    freeze : moveData.freeze,
   }
 }
 
@@ -69,6 +70,7 @@ export function showBest(props = null) {
   if (props === null) {
     gameState.live = false
     backTraceMoves()
+    moveData.freeze = true
   
     let moves = []
     let count = 0
@@ -86,11 +88,13 @@ export function showBest(props = null) {
     moveData.show = moves.slice().reverse()
   
     props = initialProps()
+    moveData.history = moveData.record.slice()
     return props
   }
 
   if (moveData.show.length === 0) {
     moveData.show = null
+    moveData.freeze = false
     return null
   }
 
@@ -101,9 +105,9 @@ export function showBest(props = null) {
   props[pieces[m.pieceId]].event = null
   pieces[m.pieceId] = m.tiles[m.tiles.length - 1]
   props[pieces[m.pieceId]].event = m.pieceId
-  console.log(m);
-  console.log(props[m.tiles[0]]);
-  console.log(props[m.tiles[m.tiles.length - 1]]);
+
+
+
 
   props[m.tiles[0]].center = m.colors[0]
   for (let i = 1; i < m.tiles.length; i++) {
@@ -122,6 +126,7 @@ export function showBest(props = null) {
 
 export function initiateRound() {
   gameState.live = true
+  moveData.freeze = false
 
   if (endState !== null) {
     pieces = endState.slice()
@@ -140,7 +145,7 @@ export function initiateRound() {
       const j = Math.floor(Math.random() * (i + 1));
       [goals[i], goals[j]] = [goals[j], goals[i]];
     }
-    console.log(goals);
+  
     target = goals[1]
   } else {
     target = goals[(goals.indexOf(target) + 1) % goals.length]
@@ -271,7 +276,7 @@ export function handleTileClick(id) {
           moveData.best = moveData.count
           moveData.record = moveData.history.slice()
           endState = pieces.slice()
-          console.log(moveData.record);
+        
 /* 
 
 
@@ -699,8 +704,8 @@ function initiateBoard() {
 
 
 export function checkPiece(id) {
-  console.log(id);
-  console.log(pieces);
+
+
   if (pieces.includes(id)) {
     return pieces.indexOf(id)
   }

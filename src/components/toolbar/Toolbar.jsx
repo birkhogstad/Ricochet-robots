@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import './Toolbar.style.css';
 import Piece from '../util/Piece';
@@ -15,7 +15,7 @@ export default function Toolbar({
 
   const [m, setM] = useState([]);
   const [b, setB] = useState((<Button value='Start' id={0} click={clicked}/>));
-  const [up, setUp] = useState([true, true, false, false, false, true]);
+  const [up, setUp] = useState([false, false, false, false, false, true]);
 
 
   

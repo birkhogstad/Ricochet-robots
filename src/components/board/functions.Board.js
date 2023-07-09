@@ -1,5 +1,5 @@
 import { colorScaleValues, getColor } from "../../colors"
-import { centerTileIds, colors, getColorStrength, getNextOffset, getTargetPropSides, lightColors, live, roundMoves, rowLength } from "../../functions.utils"
+import { centerTileIds, getColorStrength, getNextOffset, getTargetPropSides, robots, rowLength } from "../../functions.utils"
 
 
 
@@ -9,16 +9,11 @@ let pieces = []
 let goals = []
 let tileId = null
 let moveEndPoints = []
-
-
 let target = null
-
-
 let gameState = {
   live : false,
   round : false,
 }
-
 let moveData = {
   best : null,
   count : null,
@@ -156,7 +151,7 @@ export function setInitialState(id) {
   if (pieces.length === 0) {
     let invalidIds = centerTileIds.concat(goals.map((g) => g.tileId))  
     pieces = []
-    while (pieces.length !== colors.length) {
+    while (pieces.length !== robots) {
       let id = Math.floor((Math.random()*tiles.length))
       if (! invalidIds.includes(id)) {
         invalidIds.push(id)
@@ -433,7 +428,6 @@ function getTileIdsPath(a, b) {
     arr.push(arr[arr.length - 1] + offset)
   }
   return arr
-
 }
 
 
@@ -676,4 +670,3 @@ function initiateBoard() {
   initiateGoals()
 
 }
-

@@ -5,7 +5,7 @@ import Board from '../board/Board';
 import './Hub.style.css';
 import { live, robots, roundMoves, rowLength, toggleLive } from '../../functions.utils';
 import Piece from '../util/Piece';
-import { gameIsLive, getMoveData, handleDirectionEvent, handleTileClick, initialGameState, initialProps, initiateRound, liveRound, pieceIdSelected, resetRound, startRound, undoMove } from '../board/functions.Board';
+import { gameIsLive, getMoveData, handleDirectionEvent, handleTileClick, initialGameState, initialProps, initiateRound, liveRound, pieceIdSelected, resetRound, showBest, startRound, undoMove } from '../board/functions.Board';
 import { initRoundState, roundState } from '../functions.Game';
 import Toolbar from '../toolbar/Toolbar';
 
@@ -20,9 +20,8 @@ export default function Hub({
   const [moves, setMoves] = useState(null);
   const [tileData, setTileData] = useState(null);
 
-
   useEffect(() => {
-    handleResponse(initialProps(false))
+    handleResponse(initialProps(false));
   }, []);
 
   useEffect(() => {
@@ -33,25 +32,43 @@ export default function Hub({
     }
   }, []);
 
-
   function handleResponse(resp) {
-    console.log(resp);
     if (resp === null) {
-      return
+      return;
     }
     if (resp.length === rowLength * rowLength) {
-      setTileData(resp)
+      setTileData(resp);
     }
 
-    setMoves(getMoveData())
-  
+    setMoves(getMoveData());
+  }
 
+  function showBestRoute() {
+    let p = showBest(null);
+
+    const delay = 500; 
+
+    const iterate = () => {
+      if (p !== null) {
+        setTileData(p);
+        setMoves(getMoveData())
+
+        setTimeout(() => {
+          p = showBest(p);
+          iterate();
+        }, delay);
+      }
+    };
+
+    iterate();
   }
 
 
 
+
+
+
   function stateEvent(id) {
-    console.log(id);
     switch (id) {
       case 0:
         handleResponse(initiateRound())
@@ -63,6 +80,13 @@ export default function Hub({
     
       case 2:
         handleResponse(undoMove())
+        break;
+
+      case 10:
+        if (getMoveData().best !== null) {
+          showBestRoute()
+        }
+
         break;
     
       default:
@@ -204,4 +228,6 @@ function EventListener({
     </div>
   )
 }
+
+
 

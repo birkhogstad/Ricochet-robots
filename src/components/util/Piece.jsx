@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { getPieceColor } from '../../functions.utils';
+import { getColor, getRobotColor } from '../../colors';
 
 function Piece({
   id,
@@ -14,7 +15,7 @@ function Piece({
 
 
   useEffect(() => {
-    setC(getPieceColor(id))
+    setC(getRobotColor(id))
   }, [id]);
 
   useEffect(() => {

@@ -36,6 +36,7 @@ export default function Board({
   },[])
 
   useEffect(() => {
+    console.log(tileData);
     setData(tileData)
   },[tileData])
 
@@ -106,10 +107,13 @@ function Tile({
       setActive(false)
     }
 
+    
+
     if (data.event === null) {
       setChild ((<span style={{margin : 'auto', fontSize : '10px'}}>{data.id}</span>))
     }
     if (data.event !== null) {
+      console.log(data.id);
       setChild ((<Piece id={data.event} />))
     }
 
@@ -130,36 +134,83 @@ function Tile({
       <div className='Tile' style={{backgroundColor : 'black', width : dimentions, height : dimentions}}></div>
     )
   }
-  return(
-    <div className='Tile' style={{width : dimentions, height : dimentions}}>
-      <div style={{display : 'flex', width : '100%', height : '10%'}}>
-        <div className='TileCorner' style={{backgroundColor : corners[0]}}></div>
-        <div style={{backgroundColor : d.sides[0], width : '80%', height : '100%'}}></div>
-        <div className='TileCorner' style={{backgroundColor : corners[1]}}></div>
-      </div>
-      <div style={{display : 'flex', width : '100%', height : '80%'}}>
-        <div style={{backgroundColor : d.sides[3], width : '10%', height : '100%'}}></div>
-        <div style={{backgroundColor : d.center, width : '80%', height : '100%', display : 'flex'}}>
-          <button 
-            className='TileButton'
-            type='button'
-            onClick={(e) => click(d.id)}
-          >
-            {child}
 
-          </button>
+
+
+  return(
+
+    
+        <button 
+          className='TileButton'
+          type='button'
+          style={{width : dimentions, height : dimentions}}
+          onClick={(e) => click(d.id)}
+        >
+        <div style={{display : 'flex', width : '100%', height : '10%'}}>
+          <div className='TileCorner' style={{backgroundColor : corners[0]}}></div>
+          <div style={{backgroundColor : d.sides[0], width : '80%', height : '100%'}}></div>
+          <div className='TileCorner' style={{backgroundColor : corners[1]}}></div>
         </div>
-        <div style={{backgroundColor : d.sides[1], width : '10%', height : '100%'}}></div>
-      </div>
-      <div style={{display : 'flex', width : '100%', height : '10%'}}>
-        <div className='TileCorner' style={{backgroundColor : corners[3]}}></div>
+        <div style={{display : 'flex', width : '100%', height : '80%'}}>
+          <div style={{backgroundColor : d.sides[3], width : '10%', height : '100%'}}></div>
+          <div style={{backgroundColor : d.center, width : '80%', height : '100%', display : 'flex'}}>
+{/*   
+              {child}
+ */}
+          {
+            data.event === null ? (<span style={{margin : 'auto', fontSize : '10px'}}>{data.id}</span>)
+            : (<Piece id={data.event} />)
+
+          }
+          </div>
+          <div style={{backgroundColor : d.sides[1], width : '10%', height : '100%'}}></div>
+        </div>
+        <div style={{display : 'flex', width : '100%', height : '10%'}}>
+          <div className='TileCorner' style={{backgroundColor : corners[3]}}></div>
           <div style={{backgroundColor : d.sides[2], width : '80%', height : '100%'}}></div>
-        <div className='TileCorner' style={{backgroundColor : corners[2]}}></div>
-      </div>
+          <div className='TileCorner' style={{backgroundColor : corners[2]}}></div>
+        </div>
+      </button>
+
+
+  )
+/* 
+  return(
+
+    
+    <div className='Tile' style={{width : dimentions, height : dimentions}}>
+        <button 
+          className='TileButton'
+          type='button'
+          style={{width : dimentions, height : dimentions}}
+          onClick={(e) => click(d.id)}
+        >
+        <div style={{display : 'flex', width : '100%', height : '10%'}}>
+          <div className='TileCorner' style={{backgroundColor : corners[0]}}></div>
+          <div style={{backgroundColor : d.sides[0], width : '80%', height : '100%'}}></div>
+          <div className='TileCorner' style={{backgroundColor : corners[1]}}></div>
+        </div>
+        <div style={{display : 'flex', width : '100%', height : '80%'}}>
+          <div style={{backgroundColor : d.sides[3], width : '10%', height : '100%'}}></div>
+          <div style={{backgroundColor : d.center, width : '80%', height : '100%', display : 'flex'}}>
+  
+              {child}
+
+          </div>
+          <div style={{backgroundColor : d.sides[1], width : '10%', height : '100%'}}></div>
+        </div>
+        <div style={{display : 'flex', width : '100%', height : '10%'}}>
+          <div className='TileCorner' style={{backgroundColor : corners[3]}}></div>
+            <div style={{backgroundColor : d.sides[2], width : '80%', height : '100%'}}></div>
+          <div className='TileCorner' style={{backgroundColor : corners[2]}}></div>
+        </div>
+      </button>
     </div>
 
 
   )
+ */
+
   
 }
 

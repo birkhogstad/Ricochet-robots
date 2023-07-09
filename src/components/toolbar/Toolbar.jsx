@@ -44,13 +44,13 @@ export default function Toolbar({
 
 
   
-  console.log(moveData);
 
   return (
     <div className='Toolbar'>
       <div className='Section' style={{height : '20%'}}>
         <Button value='Game mechanics' id={4} click={clicked}/>
         <Button value='Controls' id={5} click={clicked}/>
+        <Button value='Show solution' id={10} click={clicked}/>
       </div>
       <div className='Section' style={{height : '20%'}}>
         {

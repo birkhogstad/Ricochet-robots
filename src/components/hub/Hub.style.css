@@ -1,5 +1,4 @@
 .Body {
-  background-color: green;
   min-width: 80%;
   min-height: 100%;
   width: fit-content;
@@ -7,7 +6,6 @@
   
 }
 .StatesColumn {
-  background-color: burlywood;
   width: 20%;
   height: 400px;
   margin: 0;

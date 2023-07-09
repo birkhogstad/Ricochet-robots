@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { centerTileIds, colors, rowLength } from '../../functions.utils';
+import { centerTileIds, rowLength } from '../../functions.utils';
 
 
 import './Board.style.css';
@@ -22,9 +22,9 @@ export default function Board({
   useEffect(() => {
     let ids = []
     let id = 0
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < rowLength; i++) {
       let row = []
-      for (let j = 0; j < 16; j++) {
+      for (let j = 0; j < rowLength; j++) {
         row.push(id)
         id++
       }
@@ -48,8 +48,6 @@ export default function Board({
   function clicked(id) {
     click(id)
   }
-
-
 
   if (
     [
@@ -95,7 +93,6 @@ function Tile({
 
   const [d, setD] = useState(null)
   const [active, setActive] = useState(true)
-  const [child, setChild] = useState(null)
   const [dimentions, setDimentions] = useState(null)
 
   
@@ -105,21 +102,11 @@ function Tile({
       setActive(false)
     }
 
-    
-
-    if (data.event === null) {
-      setChild ((<span style={{margin : 'auto', fontSize : '10px'}}>{data.id}</span>))
-    }
-    if (data.event !== null) {
-      setChild ((<Piece id={data.event} />))
-    }
-
   },[data])
   
   useEffect(() => {
     setDimentions(sideSize + 'px')
   },[sideSize])
-
 
 
   if (d === null) {
@@ -132,11 +119,7 @@ function Tile({
     )
   }
 
-
-
   return(
-
-    
         <button 
           className='TileButton'
           type='button'
@@ -151,13 +134,9 @@ function Tile({
         <div style={{display : 'flex', width : '100%', height : '80%'}}>
           <div style={{backgroundColor : d.sides[3], width : '10%', height : '100%'}}></div>
           <div style={{backgroundColor : d.center, width : '80%', height : '100%', display : 'flex'}}>
-{/*   
-              {child}
- */}
           {
             data.event === null ? (<span style={{margin : 'auto', fontSize : '10px'}}>{data.id}</span>)
             : (<Piece id={data.event} />)
-
           }
           </div>
           <div style={{backgroundColor : d.sides[1], width : '10%', height : '100%'}}></div>
@@ -168,7 +147,5 @@ function Tile({
           <div className='TileCorner' style={{backgroundColor : corners[2]}}></div>
         </div>
       </button>
-
-
   )
 }

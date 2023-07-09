@@ -4,7 +4,6 @@ import Board from '../board/Board';
 
 import './Hub.style.css';
 import { rowLength } from '../../functions.utils';
-import Piece from '../util/Piece';
 import { boardEvent, gameIsLive, getMoveData, initialProps, liveRound, pieceIdSelected, setInitialState, showBest, undoMove } from '../board/functions.Board';
 import Toolbar from '../toolbar/Toolbar';
 
